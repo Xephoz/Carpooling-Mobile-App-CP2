@@ -27,8 +27,6 @@ class RegisterActivity : AppCompatActivity() {
 
         firebaseAuth = FirebaseAuth.getInstance()
 
-        // Inside onCreate, below firebaseAuth = FirebaseAuth.getInstance()
-        val registerButton = binding.registerButton
         val registerProgressBar = findViewById<ProgressBar>(R.id.registerProgressBar)
 
         binding.registerButton.setOnClickListener {
