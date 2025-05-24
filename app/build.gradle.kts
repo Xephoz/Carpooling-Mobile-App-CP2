@@ -57,6 +57,8 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.filament.android)
     implementation(libs.firebase.database)
+    implementation(libs.google.firebase.firestore.ktx)
+    implementation(libs.firebase.firestore)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
