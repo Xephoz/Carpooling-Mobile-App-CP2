@@ -20,14 +20,16 @@
             android:name=".MainActivity"
             android:exported="false"
             android:theme="@style/Theme.Capstone2"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait">
         </activity>
 
         <activity
             android:name=".LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.Capstone2"
-            android:windowSoftInputMode="adjustPan">
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -39,8 +41,18 @@
             android:name=".RegisterActivity"
             android:exported="false"
             android:theme="@style/Theme.Capstone2"
-            android:windowSoftInputMode="adjustPan">
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait">
         </activity>
+
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Capstone2"
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait">
+        </activity>
+
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

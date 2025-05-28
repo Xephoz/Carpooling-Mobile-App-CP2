@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/cyan"
+    android:background="@color/primary"
     android:orientation="vertical"
     android:padding="20dp">
 
@@ -34,7 +34,7 @@
             android:id="@+id/login_email"
             android:layout_width="match_parent"
             android:layout_height="45dp"
-            android:background="@drawable/rounded_corners"
+            android:background="@drawable/rounded_corners_black"
             android:drawableStart="@drawable/outline_email_24"
             android:drawablePadding="10dp"
             android:fontFamily="sans-serif"
@@ -58,7 +58,7 @@
             android:id="@+id/login_password"
             android:layout_width="match_parent"
             android:layout_height="45dp"
-            android:background="@drawable/rounded_corners"
+            android:background="@drawable/rounded_corners_black"
             android:drawableStart="@drawable/outline_lock_24"
             android:drawablePadding="10dp"
             android:fontFamily="sans-serif"
@@ -90,7 +90,7 @@
         android:textColor="@color/white"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:background="@drawable/rounded_corners" />
+        android:background="@drawable/rounded_corners_black" />
 
     <TextView
         android:id="@+id/registerRedirectText"

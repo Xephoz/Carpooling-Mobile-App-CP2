@@ -8,8 +8,34 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="gray_icon">#675e60</color>
+    <color name="gray_icon">#484e54</color>
     <color name="gray_font">#928f94</color>
     <color name="gray_font_2">#B4B1B6</color>
-    <color name="cyan">#141c27</color>
+    <color name="gray_font_3">#DEDAE0</color>
+    <color name="primary">#141C27</color>
+    <color name="secondary">#384654</color>
+    <color name="tertiary">#567787</color>
+
+<!--    palette    -->
+    <color name="primary_0">#1d242b</color>
+    <color name="primary_1">#32383f</color>
+    <color name="primary_2">#484e54</color>
+    <color name="primary_3">#60656b</color>
+    <color name="primary_4">#787d82</color>
+    <color name="primary_5">#929599</color>
+
+    <color name="surface_0">#141b26</color>
+    <color name="surface_1">#2a303a</color>
+    <color name="surface_2">#414650</color>
+    <color name="surface_3">#595e67</color>
+    <color name="surface_4">#73777e</color>
+    <color name="surface_5">#8d9097</color>
+
+    <color name="tonal_0">#151c26</color>
+    <color name="tonal_1">#2b313a</color>
+    <color name="tonal_2">#424750</color>
+    <color name="tonal_3">#5a5f67</color>
+    <color name="tonal_4">#73777e</color>
+    <color name="tonal_5">#8d9197</color>
+
 </resources>
