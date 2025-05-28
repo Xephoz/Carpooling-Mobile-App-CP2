@@ -2,8 +2,6 @@ package com.example.capstone2
 
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.capstone2.databinding.ActivityProfileBinding

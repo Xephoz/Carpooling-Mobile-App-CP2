@@ -2,7 +2,6 @@ package com.example.capstone2
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Patterns
 import android.view.inputmethod.InputMethodManager
@@ -10,11 +9,12 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import com.example.capstone2.databinding.ActivityLoginBinding
-import com.google.firebase.auth.FirebaseAuth
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.drawable.toDrawable
+import com.example.capstone2.databinding.ActivityLoginBinding
 import com.google.android.material.textfield.TextInputEditText
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 
 class LoginActivity : AppCompatActivity() {
@@ -79,7 +79,7 @@ class LoginActivity : AppCompatActivity() {
                 dialog.dismiss()
             }
             if (dialog.window != null){
-                dialog.window!!.setBackgroundDrawable(ColorDrawable(0))
+                dialog.window!!.setBackgroundDrawable(0.toDrawable())
             }
             dialog.show()
         }
