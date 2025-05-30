@@ -59,9 +59,9 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
         Text(text = "Hello $name!")
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = {
-            context.startActivity(Intent(context, ProfileActivity::class.java))
+            context.startActivity(Intent(context, MapsActivity::class.java))
         }) {
-            Text("Go to Profile")
+            Text("Go to Maps")
         }
     }
 }

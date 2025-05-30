@@ -3,5 +3,7 @@
     <string name="register_redirect_text">Don\'t have an account yet? <font color="#9575CD">Register</font></string>
     <string name="login_redirect_text">Already have an account? <font color="#9575CD">Login</font></string>
     <string name="forgot_password_text"><u>Forgot your password?</u></string>
+    <string name="maps_api_key">AIzaSyCd1eXPfzo5wxcr_xAaCPxhCWIZJmIDMwU</string>
+    <string name="title_activity_maps">MapsActivity</string>
 
 </resources>
