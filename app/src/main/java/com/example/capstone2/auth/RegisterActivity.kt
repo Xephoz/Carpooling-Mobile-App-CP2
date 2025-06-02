@@ -1,4 +1,4 @@
-package com.example.capstone2
+package com.example.capstone2.auth
 
 import android.content.Intent
 import android.os.Bundle
@@ -7,18 +7,18 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import com.example.capstone2.databinding.ActivityRegisterBinding
+import com.example.capstone2.R
+import com.example.capstone2.databinding.AuthRegisterBinding
+import com.example.capstone2.model.UserProfile
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.firestore.FirebaseFirestore
-import com.example.capstone2.model.UserProfile
-
 
 class RegisterActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityRegisterBinding
+    private lateinit var binding: AuthRegisterBinding
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
 
@@ -26,7 +26,7 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        binding = ActivityRegisterBinding.inflate(layoutInflater)
+        binding = AuthRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         firebaseAuth = FirebaseAuth.getInstance()
@@ -72,7 +72,12 @@ class RegisterActivity : AppCompatActivity() {
                                             .addOnSuccessListener {
                                                 Toast.makeText(this, "Verification email sent. Please check your inbox.", Toast.LENGTH_LONG).show()
                                                 firebaseAuth.signOut()
-                                                startActivity(Intent(this, LoginActivity::class.java))
+                                                startActivity(
+                                                    Intent(
+                                                        this,
+                                                        LoginActivity::class.java
+                                                    )
+                                                )
                                                 finish()
                                             }
                                             .addOnFailureListener {

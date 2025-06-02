@@ -1,6 +1,5 @@
-package com.example.capstone2
+package com.example.capstone2.auth
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Patterns
@@ -12,21 +11,23 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.drawable.toDrawable
-import com.example.capstone2.databinding.ActivityLoginBinding
+import com.example.capstone2.R
+import com.example.capstone2.databinding.AuthLoginBinding
+import com.example.capstone2.main.MainActivity
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 
 class LoginActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityLoginBinding
+    private lateinit var binding: AuthLoginBinding
     private lateinit var firebaseAuth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        binding = ActivityLoginBinding.inflate(layoutInflater)
+        binding = AuthLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         firebaseAuth = FirebaseAuth.getInstance()
@@ -65,12 +66,12 @@ class LoginActivity : AppCompatActivity() {
 
         binding.forgotPasswordText.setOnClickListener {
             val builder = AlertDialog.Builder(this)
-            val view = layoutInflater.inflate(R.layout.activity_reset_password, null)
+            val view = layoutInflater.inflate(R.layout.auth_reset_password, null)
             val userEmail = view.findViewById<TextInputEditText>(R.id.resetBox)
             builder.setView(view)
             val dialog = builder.create()
             view.findViewById<Button>(R.id.resetButton).setOnClickListener {
-                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(userEmail.windowToken, 0)
 
                 compareEmail(userEmail)

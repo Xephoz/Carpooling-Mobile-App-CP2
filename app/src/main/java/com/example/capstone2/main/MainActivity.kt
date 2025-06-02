@@ -1,6 +1,4 @@
-@file:JvmName("ProfileActivityKt")
-
-package com.example.capstone2
+package com.example.capstone2.main
 
 import android.content.Intent
 import android.os.Bundle
@@ -23,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.capstone2.MapsActivity
 import com.example.capstone2.ui.theme.Capstone2Theme
 
 
@@ -46,6 +45,11 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+
+
+
+
+
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     val context = LocalContext.current
@@ -66,7 +70,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = false)
 @Composable
 fun GreetingPreview() {
     Capstone2Theme {
