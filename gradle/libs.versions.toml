@@ -18,13 +18,18 @@ firebaseDatabase = "21.0.0"
 firebaseFirestoreKtx = "25.1.4"
 firebaseFirestore = "25.1.4"
 googleAndroidLibrariesMapsplatformSecretsGradlePlugin = "2.0.1"
+navigationFragmentKtx = "2.9.0"
+navigationUiKtx = "2.9.0"
 playServicesMaps = "19.2.0"
 playServicesLocation = "21.3.0"
 activity = "1.10.1"
 navigationFragment = "2.9.0"
+playServicesMapsVersion = "19.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
+androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigationUiKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -49,6 +54,7 @@ firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment", version.ref = "navigationFragment" }
+play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMapsVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
