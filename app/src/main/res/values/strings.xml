@@ -5,5 +5,7 @@
     <string name="forgot_password_text"><u>Forgot your password?</u></string>
     <string name="maps_api_key">AIzaSyCd1eXPfzo5wxcr_xAaCPxhCWIZJmIDMwU</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment"><font color="white">Hello blank fragment</font></string>
 
 </resources>
