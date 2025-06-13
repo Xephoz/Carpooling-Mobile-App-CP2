@@ -5,4 +5,9 @@
         <item name="cornerSize">50%</item>
     </style>
 
+    <style name="RemoveRedBackground" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeErrorColor">@android:color/transparent</item>
+        <item name="hintTextColor">@color/gray_font</item>
+    </style>
+
 </resources>

@@ -2,7 +2,8 @@ package com.example.capstone2.model
 
 enum class Gender {
     MALE,
-    FEMALE
+    FEMALE,
+    OTHER
 }
 
 data class UserProfile(

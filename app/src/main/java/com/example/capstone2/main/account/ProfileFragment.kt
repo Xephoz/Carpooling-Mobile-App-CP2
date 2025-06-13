@@ -4,9 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.capstone2.databinding.AccountProfileBinding
+import com.example.capstone2.model.Gender
 import com.example.capstone2.model.UserProfile
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -30,6 +32,7 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         loadUserProfile()
+        setupGenderDropdown()
     }
 
     private fun loadUserProfile() {
@@ -51,7 +54,17 @@ class ProfileFragment : Fragment() {
                         binding.lastNameBox.setText(userProfile.lastName)
                         binding.emailBox.setText(userProfile.email)
                         binding.phoneBox.setText(userProfile.phoneNumber ?: "")
+
+                        val genderText = when (userProfile.gender) {
+                            Gender.MALE -> "Male"
+                            Gender.FEMALE -> "Female"
+                            Gender.OTHER -> "Other"
+                            else -> ""
+                        }
+
+                        binding.genderBox.setText(genderText, false)
                     }
+
                 } else {
                     Toast.makeText(requireContext(), "User profile not found.", Toast.LENGTH_SHORT).show()
                 }
@@ -59,6 +72,12 @@ class ProfileFragment : Fragment() {
             .addOnFailureListener { exception ->
                 Toast.makeText(requireContext(), "Failed to load profile: ${exception.message}", Toast.LENGTH_LONG).show()
             }
+    }
+
+    private fun setupGenderDropdown() {
+        val genderOptions = listOf("Male", "Female", "Other")
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, genderOptions)
+        binding.genderBox.setAdapter(adapter)
     }
 
     override fun onDestroyView() {

@@ -25,7 +25,7 @@
 
         <activity
             android:name=".main.MainActivity"
-            android:exported="true"
+            android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Capstone2"
             android:windowSoftInputMode="adjustPan">
@@ -34,7 +34,6 @@
         <activity
             android:name=".auth.LoginActivity"
             android:exported="true"
-            android:screenOrientation="portrait"
             android:theme="@style/Theme.Capstone2"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
@@ -42,21 +41,18 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
+
+        <activity
+            android:name="com.google.android.libraries.places.widget.AutocompleteActivity" />
 
         <activity
             android:name=".auth.RegisterActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:theme="@style/Theme.Capstone2"
             android:windowSoftInputMode="adjustPan" />
 
-        <activity
-            android:name=".ProfileActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.Capstone2"
-            android:windowSoftInputMode="adjustPan" />
 
         <meta-data
             android:name="preloaded_fonts"

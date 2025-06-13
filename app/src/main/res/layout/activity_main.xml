@@ -25,6 +25,7 @@
         android:background="@color/surface_1"
         app:itemTextColor="@color/primary_5"
         app:itemIconTint="@color/primary_5"
-        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"/>
+        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
+        app:labelVisibilityMode="labeled"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
