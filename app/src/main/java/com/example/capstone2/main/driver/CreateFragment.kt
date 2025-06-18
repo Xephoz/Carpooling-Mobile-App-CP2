@@ -32,7 +32,6 @@ import com.google.firebase.ktx.Firebase
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import java.util.Calendar
-import java.util.Locale
 
 
 class CreateFragment : Fragment() {
@@ -193,17 +192,51 @@ class CreateFragment : Fragment() {
         val timePicker = TimePickerDialog(
             requireContext(),
             { _, hour, minute ->
-                selectedDateTime.set(Calendar.HOUR_OF_DAY, hour)
-                selectedDateTime.set(Calendar.MINUTE, minute)
+                // Create a temporary calendar to validate
+                val tempCalendar = Calendar.getInstance().apply {
+                    set(
+                        selectedDateTime.get(Calendar.YEAR),
+                        selectedDateTime.get(Calendar.MONTH),
+                        selectedDateTime.get(Calendar.DAY_OF_MONTH),
+                        hour,
+                        minute
+                    )
+                }
 
-                // Update the UI with selected date/time
-                updateDateTimeUI()
+                // Check if selected time is in the future
+                if (tempCalendar.timeInMillis <= System.currentTimeMillis()) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Please select a time in the future",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    // Show time picker again
+                    showTimePicker()
+                } else {
+                    selectedDateTime.set(Calendar.HOUR_OF_DAY, hour)
+                    selectedDateTime.set(Calendar.MINUTE, minute)
+                    updateDateTimeUI()
+                }
             },
             selectedDateTime.get(Calendar.HOUR_OF_DAY),
             selectedDateTime.get(Calendar.MINUTE),
-            false // 24-hour format
+            false
         )
+
+        // Set minimum time if it's today's date
+        if (isToday(selectedDateTime)) {
+            val now = Calendar.getInstance()
+            timePicker.updateTime(now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE))
+        }
+
         timePicker.show()
+    }
+
+    private fun isToday(calendar: Calendar): Boolean {
+        val today = Calendar.getInstance()
+        return calendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+                calendar.get(Calendar.MONTH) == today.get(Calendar.MONTH) &&
+                calendar.get(Calendar.DAY_OF_MONTH) == today.get(Calendar.DAY_OF_MONTH)
     }
 
     private fun updateDateTimeUI() {
@@ -267,6 +300,13 @@ class CreateFragment : Fragment() {
         if (!isDateTimeSelected) {
             binding.setDate.error = "Please select departure time"
             showError("Departure time required")
+            return
+        }
+
+        // Final timestamp validation
+        if (selectedDateTime.timeInMillis <= System.currentTimeMillis()) {
+            binding.setDate.error = "Please select a future date and time"
+            showError("Departure time must be in the future")
             return
         }
 
