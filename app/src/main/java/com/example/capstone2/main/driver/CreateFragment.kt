@@ -29,6 +29,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
+import java.util.Calendar
+import java.util.Locale
 
 
 class CreateFragment : Fragment() {
@@ -39,7 +43,10 @@ class CreateFragment : Fragment() {
     private lateinit var universities: List<University>
     private var selectedStartPlace: Place? = null
     private lateinit var placesClient: PlacesClient
+    private lateinit var selectedDateTime: Calendar
     private val TAG = "CreateRideFragment"
+    private var isDateTimeSelected = false
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,9 +66,11 @@ class CreateFragment : Fragment() {
             Places.initialize(requireContext(), apiKey)
         }
         placesClient = Places.createClient(requireContext())
-
         setupStartLocationAutocomplete()
         fetchUniversities()
+
+        selectedDateTime = Calendar.getInstance()
+        setupDateTimePicker()
 
         binding.createButton.setOnClickListener {
             createRide()
@@ -155,6 +164,60 @@ class CreateFragment : Fragment() {
         binding.setEnd.setOnClickListener { binding.setEnd.showDropDown() }
     }
 
+    private fun setupDateTimePicker() {
+        binding.setDate.setOnClickListener {
+            // First show date picker
+            showDatePicker()
+        }
+    }
+
+    private fun showDatePicker() {
+        val datePicker = DatePickerDialog(
+            requireContext(),
+            { _, year, month, day ->
+                selectedDateTime.set(year, month, day)
+                // After date is selected, show time picker
+                showTimePicker()
+            },
+            selectedDateTime.get(Calendar.YEAR),
+            selectedDateTime.get(Calendar.MONTH),
+            selectedDateTime.get(Calendar.DAY_OF_MONTH)
+        )
+
+        // Set minimum date to current time
+        datePicker.datePicker.minDate = System.currentTimeMillis() - 1000
+        datePicker.show()
+    }
+
+    private fun showTimePicker() {
+        val timePicker = TimePickerDialog(
+            requireContext(),
+            { _, hour, minute ->
+                selectedDateTime.set(Calendar.HOUR_OF_DAY, hour)
+                selectedDateTime.set(Calendar.MINUTE, minute)
+
+                // Update the UI with selected date/time
+                updateDateTimeUI()
+            },
+            selectedDateTime.get(Calendar.HOUR_OF_DAY),
+            selectedDateTime.get(Calendar.MINUTE),
+            false // 24-hour format
+        )
+        timePicker.show()
+    }
+
+    private fun updateDateTimeUI() {
+        val dateFormat = android.text.format.DateFormat.getDateFormat(requireContext())
+        val timeFormat = android.text.format.DateFormat.getTimeFormat(requireContext())
+
+        val dateStr = dateFormat.format(selectedDateTime.time)
+        val timeStr = timeFormat.format(selectedDateTime.time)
+
+        binding.setDate.setText("$dateStr $timeStr")
+        isDateTimeSelected = true
+        binding.setDate.error = null // Clear any previous error
+    }
+
     private fun createRide() {
         // Show loading state
         binding.createProgressBar.visibility = View.VISIBLE
@@ -200,6 +263,13 @@ class CreateFragment : Fragment() {
             return
         }
 
+        // Add date validation
+        if (!isDateTimeSelected) {
+            binding.setDate.error = "Please select departure time"
+            showError("Departure time required")
+            return
+        }
+
         // Create location objects
         val startPlace = selectedStartPlace!!
         val startLocation = LocationInfo(
@@ -226,8 +296,8 @@ class CreateFragment : Fragment() {
             vehicleId = vehicleId,
             startLocation = startLocation,
             endLocation = endLocation,
-            departureTime = Timestamp.now(), // TODO: Replace with actual date picker value
             maxPassengers = maxPassengers,
+            departureTime = Timestamp(selectedDateTime.time),
             femaleOnly = binding.setFemaleOnly.isChecked
         )
 
