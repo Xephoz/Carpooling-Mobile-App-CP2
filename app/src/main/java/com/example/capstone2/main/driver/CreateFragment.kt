@@ -1,5 +1,7 @@
 package com.example.capstone2.main.driver
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -11,11 +13,13 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.example.capstone2.R
 import com.example.capstone2.databinding.DriverCreateBinding
 import com.example.capstone2.model.LocationInfo
 import com.example.capstone2.model.Ride
 import com.example.capstone2.model.University
+import com.example.capstone2.viewmodels.CreateRideViewModel
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.PlacesClient
@@ -29,22 +33,18 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
 import java.util.Calendar
 
 
 class CreateFragment : Fragment() {
 
+    private lateinit var viewModel: CreateRideViewModel
     private var _binding: DriverCreateBinding? = null
     private val binding get() = _binding!!
     private val db = Firebase.firestore
     private lateinit var universities: List<University>
-    private var selectedStartPlace: Place? = null
     private lateinit var placesClient: PlacesClient
-    private lateinit var selectedDateTime: Calendar
     private val TAG = "CreateRideFragment"
-    private var isDateTimeSelected = false
 
 
     override fun onCreateView(
@@ -58,6 +58,7 @@ class CreateFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel = ViewModelProvider(this).get(CreateRideViewModel::class.java)
 
         // Initialize Places API
         if (!Places.isInitialized()) {
@@ -65,42 +66,49 @@ class CreateFragment : Fragment() {
             Places.initialize(requireContext(), apiKey)
         }
         placesClient = Places.createClient(requireContext())
+
         setupStartLocationAutocomplete()
         fetchUniversities()
-
-        selectedDateTime = Calendar.getInstance()
         setupDateTimePicker()
+        restoreFromViewModel()
 
         binding.createButton.setOnClickListener {
             createRide()
         }
     }
 
-    private fun setupStartLocationAutocomplete() {
-        val startAutocomplete = binding.setStart
-
-        val autocompleteIntent = Autocomplete.IntentBuilder(
-            AutocompleteActivityMode.OVERLAY,
-            listOf(
-                Place.Field.ID,
-                Place.Field.NAME,
-                Place.Field.LAT_LNG,
-                Place.Field.ADDRESS
-            )
-        )
-            .setCountries(listOf("my"))
-            .build(requireContext())
-
-        // Set click listener for the TextInputEditText
-        startAutocomplete.setOnClickListener {
-            startAutocomplete.hideKeyboard()
-            startActivityForResult(autocompleteIntent, AUTOCOMPLETE_REQUEST_CODE)
+    private fun restoreFromViewModel() {
+        // Restore starting point
+        viewModel.selectedStartPlace?.let { place ->
+            binding.setStart.setText(place.name ?: place.address)
+            binding.startBox.hint = "Starting point selected"
         }
 
-        // Optional: Set focus change listener to trigger search when focused
-        startAutocomplete.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                startAutocomplete.hideKeyboard()
+        // Restore other fields
+        viewModel.selectedUniversityName?.let { binding.setEnd.setText(it) }
+        viewModel.vehicleId?.let { binding.setVehicle.setText(it) }
+        viewModel.maxPassengers?.let { binding.setMaxPassengers.setText(it.toString()) }
+        binding.setFemaleOnly.isChecked = viewModel.femaleOnly
+
+        // Restore date/time if selected
+        if (viewModel.isDateTimeSelected) {
+            updateDateTimeUI()
+        }
+    }
+
+    private fun setupStartLocationAutocomplete() {
+        binding.setStart.apply {
+            isFocusable = false
+            isFocusableInTouchMode = false
+
+            setOnClickListener {
+                val autocompleteIntent = Autocomplete.IntentBuilder(
+                    AutocompleteActivityMode.OVERLAY,
+                    listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ADDRESS)
+                )
+                    .setCountries(listOf("my"))
+                    .build(requireContext())
+
                 startActivityForResult(autocompleteIntent, AUTOCOMPLETE_REQUEST_CODE)
             }
         }
@@ -108,26 +116,13 @@ class CreateFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
-            when (resultCode) {
-                RESULT_OK -> {
-                    data?.let {
-                        val place = Autocomplete.getPlaceFromIntent(data)
-                        selectedStartPlace = place
-                        binding.setStart.setText(place.name ?: place.address)
-                        binding.startBox.hint = "Starting point selected"
-                        binding.startBox.error = null
-                    }
-                }
-                AutocompleteActivity.RESULT_ERROR -> {
-                    data?.let {
-                        val status = Autocomplete.getStatusFromIntent(data)
-                        Log.e(TAG, "Error: ${status.statusMessage}")
-                    }
-                }
-                RESULT_CANCELED -> {
-                    // The user canceled the operation
-                }
+        if (requestCode == AUTOCOMPLETE_REQUEST_CODE && resultCode == RESULT_OK) {
+            data?.let {
+                val place = Autocomplete.getPlaceFromIntent(data)
+                viewModel.selectedStartPlace = place
+                binding.setStart.setText(place.name ?: place.address)
+                binding.startBox.hint = "Starting point selected"
+                binding.startBox.error = null
             }
         }
     }
@@ -163,77 +158,67 @@ class CreateFragment : Fragment() {
         binding.setEnd.setAdapter(adapter)
         binding.setEnd.setOnItemClickListener { _, _, _, _ ->
             binding.endBox.error = null
+            viewModel.selectedUniversityName = binding.setEnd.text.toString()
         }
         binding.setEnd.setOnClickListener { binding.setEnd.showDropDown() }
     }
 
     private fun setupDateTimePicker() {
         binding.setDate.setOnClickListener {
-            // First show date picker
             showDatePicker()
         }
     }
 
     private fun showDatePicker() {
-        val datePicker = DatePickerDialog(
+        DatePickerDialog(
             requireContext(),
             { _, year, month, day ->
-                selectedDateTime.set(year, month, day)
-                // After date is selected, show time picker
+                viewModel.selectedDateTime.set(year, month, day)
                 showTimePicker()
             },
-            selectedDateTime.get(Calendar.YEAR),
-            selectedDateTime.get(Calendar.MONTH),
-            selectedDateTime.get(Calendar.DAY_OF_MONTH)
-        )
-
-        // Set minimum date to current time
-        datePicker.datePicker.minDate = System.currentTimeMillis() - 1000
-        datePicker.show()
+            viewModel.selectedDateTime.get(Calendar.YEAR),
+            viewModel.selectedDateTime.get(Calendar.MONTH),
+            viewModel.selectedDateTime.get(Calendar.DAY_OF_MONTH)
+        ).apply {
+            datePicker.minDate = System.currentTimeMillis() - 1000
+            show()
+        }
     }
 
     private fun showTimePicker() {
-        val timePicker = TimePickerDialog(
+        TimePickerDialog(
             requireContext(),
             { _, hour, minute ->
-                // Create a temporary calendar to validate
                 val tempCalendar = Calendar.getInstance().apply {
                     set(
-                        selectedDateTime.get(Calendar.YEAR),
-                        selectedDateTime.get(Calendar.MONTH),
-                        selectedDateTime.get(Calendar.DAY_OF_MONTH),
+                        viewModel.selectedDateTime.get(Calendar.YEAR),
+                        viewModel.selectedDateTime.get(Calendar.MONTH),
+                        viewModel.selectedDateTime.get(Calendar.DAY_OF_MONTH),
                         hour,
                         minute
                     )
                 }
 
-                // Check if selected time is in the future
                 if (tempCalendar.timeInMillis <= System.currentTimeMillis()) {
-                    Toast.makeText(
-                        requireContext(),
-                        "Please select a time in the future",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    // Show time picker again
+                    Toast.makeText(requireContext(), "Please select a future time", Toast.LENGTH_SHORT).show()
                     showTimePicker()
                 } else {
-                    selectedDateTime.set(Calendar.HOUR_OF_DAY, hour)
-                    selectedDateTime.set(Calendar.MINUTE, minute)
+                    viewModel.selectedDateTime.set(Calendar.HOUR_OF_DAY, hour)
+                    viewModel.selectedDateTime.set(Calendar.MINUTE, minute)
+                    viewModel.isDateTimeSelected = true
                     updateDateTimeUI()
                 }
             },
-            selectedDateTime.get(Calendar.HOUR_OF_DAY),
-            selectedDateTime.get(Calendar.MINUTE),
+            viewModel.selectedDateTime.get(Calendar.HOUR_OF_DAY),
+            viewModel.selectedDateTime.get(Calendar.MINUTE),
             false
-        )
-
-        // Set minimum time if it's today's date
-        if (isToday(selectedDateTime)) {
-            val now = Calendar.getInstance()
-            timePicker.updateTime(now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE))
+        ).apply {
+            if (isToday(viewModel.selectedDateTime)) {
+                val now = Calendar.getInstance()
+                updateTime(now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE))
+            }
+            show()
         }
-
-        timePicker.show()
     }
 
     private fun isToday(calendar: Calendar): Boolean {
@@ -246,118 +231,95 @@ class CreateFragment : Fragment() {
     private fun updateDateTimeUI() {
         val dateFormat = android.text.format.DateFormat.getDateFormat(requireContext())
         val timeFormat = android.text.format.DateFormat.getTimeFormat(requireContext())
-
-        val dateStr = dateFormat.format(selectedDateTime.time)
-        val timeStr = timeFormat.format(selectedDateTime.time)
-
-        binding.setDate.setText("$dateStr $timeStr")
-        isDateTimeSelected = true
-        binding.setDate.error = null // Clear any previous error
+        binding.setDate.setText("${dateFormat.format(viewModel.selectedDateTime.time)} ${timeFormat.format(viewModel.selectedDateTime.time)}")
+        binding.setDate.error = null
     }
 
     private fun createRide() {
-        // Show loading state
         binding.createProgressBar.visibility = View.VISIBLE
         binding.createButton.isEnabled = false
 
-        // Validate inputs
         val driverId = FirebaseAuth.getInstance().currentUser?.uid ?: run {
             showError("User not authenticated")
             return
         }
 
-        if (selectedStartPlace == null) {
-            binding.startBox.error = " "
+        val startPlace = viewModel.selectedStartPlace ?: run {
+            binding.startBox.error = "Please select a starting point"
             showError("Starting point required")
             return
         }
 
         val selectedUniversityName = binding.setEnd.text.toString()
         val selectedUniversity = universities.find { it.name == selectedUniversityName } ?: run {
-            binding.endBox.error = " "
+            binding.endBox.error = "Please select a destination"
             showError("Destination required")
             return
         }
+        viewModel.selectedUniversityName = selectedUniversityName
 
         val vehicleId = binding.setVehicle.text.toString().takeIf { it.isNotBlank() } ?: run {
             binding.setVehicle.error = "Please enter vehicle info"
             showError("Vehicle information required")
             return
         }
+        viewModel.vehicleId = vehicleId
 
-        val maxPassengersText = binding.setMaxPassengers.text.toString()
-        val maxPassengers = try {
-            val value = maxPassengersText.toInt()
-            if (value !in 1..8) {
-                binding.setMaxPassengers.error = "Must be between 1-8"
-                showError("Passenger count must be between 1-8")
-                return
-            }
-            value
-        } catch (_: NumberFormatException) {
-            binding.setMaxPassengers.error = "Please enter a number between 1-8"
+        val maxPassengers = binding.setMaxPassengers.text.toString().toIntOrNull()?.takeIf { it in 1..8 } ?: run {
+            binding.setMaxPassengers.error = "Please enter a number (1-8)"
             showError("Invalid passenger count")
             return
         }
+        viewModel.maxPassengers = maxPassengers
 
-        // Add date validation
-        if (!isDateTimeSelected) {
+        if (!viewModel.isDateTimeSelected) {
             binding.setDate.error = "Please select departure time"
             showError("Departure time required")
             return
         }
 
-        // Final timestamp validation
-        if (selectedDateTime.timeInMillis <= System.currentTimeMillis()) {
-            binding.setDate.error = "Please select a future date and time"
+        if (viewModel.selectedDateTime.timeInMillis <= System.currentTimeMillis()) {
+            binding.setDate.error = "Please select a future time"
             showError("Departure time must be in the future")
             return
         }
 
-        // Create location objects
-        val startPlace = selectedStartPlace!!
-        val startLocation = LocationInfo(
-            displayName = startPlace.address ?: startPlace.name ?: "Unknown location",
-            universityId = null,
-            placeId = startPlace.id,
-            geoPoint = GeoPoint(
-                startPlace.latLng?.latitude ?: 0.0,
-                startPlace.latLng?.longitude ?: 0.0
-            )
-        )
+        viewModel.femaleOnly = binding.setFemaleOnly.isChecked
 
-        val endLocation = LocationInfo(
-            displayName = selectedUniversity.name,
-            universityId = selectedUniversity.id,
-            placeId = selectedUniversity.placeId,
-            geoPoint = selectedUniversity.location
-        )
-
-
-        // Create ride object
         val ride = Ride(
             driverId = driverId,
             vehicleId = vehicleId,
-            startLocation = startLocation,
-            endLocation = endLocation,
+            startLocation = LocationInfo(
+                displayName = startPlace.address ?: startPlace.name ?: "Unknown location",
+                universityId = null,
+                placeId = startPlace.id,
+                geoPoint = GeoPoint(
+                    startPlace.latLng?.latitude ?: 0.0,
+                    startPlace.latLng?.longitude ?: 0.0
+                )
+            ),
+            endLocation = LocationInfo(
+                displayName = selectedUniversity.name,
+                universityId = selectedUniversity.id,
+                placeId = selectedUniversity.placeId,
+                geoPoint = selectedUniversity.location
+            ),
             maxPassengers = maxPassengers,
-            departureTime = Timestamp(selectedDateTime.time),
-            femaleOnly = binding.setFemaleOnly.isChecked
+            departureTime = Timestamp(viewModel.selectedDateTime.time),
+            femaleOnly = viewModel.femaleOnly
         )
 
-        // Save to Firestore
-        db.collection("rides")
-            .add(ride)
-            .addOnSuccessListener { documentReference ->
-                binding.createProgressBar.visibility = View.GONE
-                binding.createButton.isEnabled = true
-                Toast.makeText(context, "Ride created successfully!", Toast.LENGTH_SHORT).show()
-                clearForm()
-            }
-            .addOnFailureListener { e ->
-                Log.e(TAG, "Error creating ride", e)
-                showError("Failed to create ride: ${e.localizedMessage}")
-            }
+        db.collection("rides").add(ride)
+        .addOnSuccessListener {
+            binding.createProgressBar.visibility = View.GONE
+            binding.createButton.isEnabled = true
+            Toast.makeText(context, "Ride created!", Toast.LENGTH_SHORT).show()
+            clearForm()
+        }
+        .addOnFailureListener { e ->
+            Log.e(TAG, "Error creating ride", e)
+            showError("Failed to create ride: ${e.localizedMessage}")
+        }
     }
 
     private fun showError(message: String) {
@@ -370,7 +332,6 @@ class CreateFragment : Fragment() {
         binding.setStart.text?.clear()
         binding.startBox.error = null
         binding.startBox.hint = "Enter starting point"
-        selectedStartPlace = null
 
         binding.setEnd.text?.clear()
         binding.endBox.error = null
@@ -384,6 +345,7 @@ class CreateFragment : Fragment() {
         binding.setDate.text?.clear()
         binding.setFemaleOnly.isChecked = false
 
+        viewModel.clear()
     }
 
     override fun onDestroyView() {
