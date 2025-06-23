@@ -116,6 +116,7 @@ class CreateFragment : Fragment() {
                         selectedStartPlace = place
                         binding.setStart.setText(place.name ?: place.address)
                         binding.startBox.hint = "Starting point selected"
+                        binding.startBox.error = null
                     }
                 }
                 AutocompleteActivity.RESULT_ERROR -> {
@@ -160,6 +161,9 @@ class CreateFragment : Fragment() {
             universityNames
         )
         binding.setEnd.setAdapter(adapter)
+        binding.setEnd.setOnItemClickListener { _, _, _, _ ->
+            binding.endBox.error = null
+        }
         binding.setEnd.setOnClickListener { binding.setEnd.showDropDown() }
     }
 
@@ -263,14 +267,14 @@ class CreateFragment : Fragment() {
         }
 
         if (selectedStartPlace == null) {
-            binding.startBox.error = "Please select a starting point"
+            binding.startBox.error = " "
             showError("Starting point required")
             return
         }
 
         val selectedUniversityName = binding.setEnd.text.toString()
         val selectedUniversity = universities.find { it.name == selectedUniversityName } ?: run {
-            binding.endBox.error = "Please select a destination"
+            binding.endBox.error = " "
             showError("Destination required")
             return
         }
