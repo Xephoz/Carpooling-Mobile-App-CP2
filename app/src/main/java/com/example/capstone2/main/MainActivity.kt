@@ -17,10 +17,10 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
+        // Setup NavController with BottomNavigationView
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.main_nav_host) as NavHostFragment
-        navController = navHostFragment.navController
 
-        findViewById<BottomNavigationView>(R.id.bottomNav).setupWithNavController(navController)
+        findViewById<BottomNavigationView>(R.id.bottomNav).setupWithNavController(navHostFragment.navController)
     }
 }
