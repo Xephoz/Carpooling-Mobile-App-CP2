@@ -48,20 +48,35 @@ class LoginFragment : Fragment() {
                     return@setOnClickListener
                 }
 
+                // Disable button and show progress bar
+                binding.loginButton.isEnabled = false
+                binding.loginProgressBar.visibility = View.VISIBLE
+
                 firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+                    // Re-enable button and hide progress bar regardless of outcome
+                    binding.loginButton.isEnabled = true
+                    binding.loginProgressBar.visibility = View.GONE
+
                     if (task.isSuccessful) {
                         val user = firebaseAuth.currentUser
                         if (user != null && user.isEmailVerified) {
-                            // Launch MainActivity from Fragment
                             val intent = Intent(requireActivity(), MainActivity::class.java)
                             startActivity(intent)
                             requireActivity().finish()
                         } else {
                             firebaseAuth.signOut()
-                            Toast.makeText(requireContext(), "Please verify your email before logging in.", Toast.LENGTH_LONG).show()
+                            Toast.makeText(
+                                requireContext(),
+                                "Please verify your email before logging in.",
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
                     } else {
-                        Toast.makeText(requireContext(), task.exception?.message ?: "Login failed", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            requireContext(),
+                            task.exception?.message ?: "Login failed",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             } else {
@@ -74,7 +89,6 @@ class LoginFragment : Fragment() {
         }
 
         binding.registerRedirectText.setOnClickListener {
-            // Navigate to RegisterFragment using Navigation Component
             findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
         }
     }
