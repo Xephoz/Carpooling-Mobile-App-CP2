@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,30 +8,31 @@
     android:background="@color/primary"
     android:fitsSystemWindows="true">
 
-    <!-- 1. Fixed Toolbar at Top -->
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <!-- 1. App Bar with Toolbar -->
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
         android:background="@color/primary"
-        app:title="Create a Ride"
-        app:titleTextColor="@color/white"
-        app:navigationIcon="@drawable/baseline_arrow_back_30"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        android:elevation="0dp">
 
-    <!-- 2. Scrollable Form Content -->
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="Create a Ride"
+            app:titleTextColor="@color/white"
+            app:navigationIcon="@drawable/baseline_arrow_back_30"
+            app:layout_scrollFlags="scroll|enterAlways|snap"/>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- 2. Scrollable Content -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         android:fillViewport="true"
         android:isScrollContainer="true"
-        android:scrollbars="vertical"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:layout_constraintBottom_toTopOf="@id/createButtonContainer"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:layout_marginBottom="56dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -158,16 +159,16 @@
                     android:id="@+id/border"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/surface_3"
-                    android:layout_marginBottom="15dp"/>
+                    android:layout_marginBottom="15dp"
+                    android:background="@color/surface_3" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Select vehicle"
                     android:textColorHint="@color/gray_font"
-                    app:hintTextColor="@color/white"
-                    app:boxBackgroundMode="none">
+                    app:boxBackgroundMode="none"
+                    app:hintTextColor="@color/white">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/setVehicle"
@@ -188,8 +189,8 @@
                     android:layout_marginTop="10dp"
                     android:hint="Set max passengers"
                     android:textColorHint="@color/gray_font"
-                    app:hintTextColor="@color/white"
-                    app:boxBackgroundMode="none">
+                    app:boxBackgroundMode="none"
+                    app:hintTextColor="@color/white">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/setMaxPassengers"
@@ -209,22 +210,22 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:focusable="false"
                     android:clickable="true"
+                    android:focusable="false"
                     android:hint="Select departure time"
                     android:textColorHint="@color/gray_font"
-                    app:hintTextColor="@color/white"
-                    app:boxBackgroundMode="none">
+                    app:boxBackgroundMode="none"
+                    app:hintTextColor="@color/white">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/setDate"
                         android:layout_width="match_parent"
                         android:layout_height="43dp"
-                        android:focusable="false"
-                        android:clickable="true"
                         android:background="@drawable/rounded_corners_black"
+                        android:clickable="true"
                         android:drawableStart="@drawable/outline_calendar_month_24"
                         android:drawablePadding="10dp"
+                        android:focusable="false"
                         android:fontFamily="sans-serif"
                         android:inputType="none"
                         android:padding="0dp"
@@ -236,46 +237,50 @@
                     android:id="@+id/setFemaleOnly"
                     android:layout_width="match_parent"
                     android:layout_height="43dp"
-                    android:layout_marginVertical="20dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="40dp"
                     android:paddingHorizontal="17dp"
                     android:text="Female only ride"
                     android:textColor="@color/white"
-                    android:textSize="18sp"/>
+                    android:textSize="18sp" />
+
+                <!-- 3. Floating Button -->
+                <FrameLayout
+                    android:id="@+id/createButtonContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginBottom="56dp"
+                    android:paddingVertical="5dp">
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/createButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="55dp"
+                        android:background="@drawable/rounded_corners_black"
+                        android:elevation="8dp"
+                        android:foreground="@drawable/button_border"
+                        android:text="Create Ride"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <ProgressBar
+                        android:id="@+id/createProgressBar"
+                        style="?android:attr/progressBarStyleSmall"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="end|center_vertical"
+                        android:layout_marginEnd="20dp"
+                        android:indeterminateTint="@color/gray_icon"
+                        android:visibility="gone" />
+                </FrameLayout>
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- 3. Floating Button at Bottom -->
-    <FrameLayout
-        android:id="@+id/createButtonContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingVertical="5dp"
-        android:paddingHorizontal="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/createButton"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:background="@drawable/rounded_corners_black"
-            android:text="Create Ride"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:elevation="8dp"/>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-        <ProgressBar
-            android:id="@+id/createProgressBar"
-            style="?android:attr/progressBarStyleSmall"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_gravity="end|center_vertical"
-            android:layout_marginEnd="20dp"
-            android:visibility="gone"
-            android:indeterminateTint="@color/gray_icon"/>
-    </FrameLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+<!--20011656@imail.sunway.edu.my-->
