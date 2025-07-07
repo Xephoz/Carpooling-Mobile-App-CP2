@@ -2,14 +2,12 @@ package com.example.capstone2.main.driver
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -24,8 +22,6 @@ import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.libraries.places.widget.Autocomplete
-import com.google.android.libraries.places.widget.AutocompleteActivity
-import com.google.android.libraries.places.widget.PlaceAutocompleteActivity.Companion.RESULT_CANCELED
 import com.google.android.libraries.places.widget.PlaceAutocompleteActivity.Companion.RESULT_OK
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.firebase.Timestamp
@@ -80,7 +76,17 @@ class CreateFragment : Fragment() {
     private fun restoreFromViewModel() {
         // Restore starting point
         viewModel.selectedStartPlace?.let { place ->
-            binding.setStart.setText(place.name ?: place.address)
+            val placeName = place.name ?: ""
+            val placeAddress = place.address ?: ""
+            val displayText = if (!placeName.isNullOrEmpty() && placeAddress.startsWith(placeName)) {
+                placeAddress
+            } else {
+                listOf(placeName, placeAddress)
+                    .filter { !it.isNullOrEmpty() }
+                    .joinToString(" - ")
+            }
+
+            binding.setStart.setText(displayText)
             binding.startBox.hint = "Starting point selected"
         }
 
@@ -104,7 +110,11 @@ class CreateFragment : Fragment() {
             setOnClickListener {
                 val autocompleteIntent = Autocomplete.IntentBuilder(
                     AutocompleteActivityMode.OVERLAY,
-                    listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ADDRESS)
+                    listOf(
+                        Place.Field.ID,
+                        Place.Field.NAME,
+                        Place.Field.LAT_LNG,
+                        Place.Field.ADDRESS)
                 )
                     .setCountries(listOf("my"))
                     .build(requireContext())
@@ -119,18 +129,21 @@ class CreateFragment : Fragment() {
         if (requestCode == AUTOCOMPLETE_REQUEST_CODE && resultCode == RESULT_OK) {
             data?.let {
                 val place = Autocomplete.getPlaceFromIntent(data)
+                val placeName = place.name ?: ""
+                val placeAddress = place.address ?: ""
+                val displayText = if (!placeName.isNullOrEmpty() && placeAddress.startsWith(placeName)) {
+                    placeAddress
+                } else {
+                    listOf(placeName, placeAddress)
+                        .filter { !it.isNullOrEmpty() }
+                        .joinToString(" - ")
+                }
                 viewModel.selectedStartPlace = place
-                binding.setStart.setText(place.name ?: place.address)
+                binding.setStart.setText(displayText)
                 binding.startBox.hint = "Starting point selected"
                 binding.startBox.error = null
             }
         }
-    }
-
-    // Helper extension to hide keyboard
-    private fun View.hideKeyboard() {
-        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(windowToken, 0)
     }
 
     private fun fetchUniversities() {
@@ -258,11 +271,14 @@ class CreateFragment : Fragment() {
         }
         viewModel.selectedUniversityName = selectedUniversityName
 
-        val vehicleId = binding.setVehicle.text.toString().takeIf { it.isNotBlank() } ?: run {
-            binding.setVehicle.error = "Please enter vehicle info"
-            showError("Vehicle information required")
-            return
-        }
+        val vehicleId = binding.setVehicle.text.toString()
+            .takeIf { it.isNotBlank() }
+            ?.uppercase()
+            ?: run {
+                binding.setVehicle.error = "Please enter vehicle info"
+                showError("Vehicle information required")
+                return
+            }
         viewModel.vehicleId = vehicleId
 
         val maxPassengers = binding.setMaxPassengers.text.toString().toIntOrNull()?.takeIf { it in 1..8 } ?: run {
@@ -290,7 +306,8 @@ class CreateFragment : Fragment() {
             driverId = driverId,
             vehicleId = vehicleId,
             startLocation = LocationInfo(
-                displayName = startPlace.address ?: startPlace.name ?: "Unknown location",
+                displayName = startPlace.name ?: "Unnamed Location",
+                fullAddress = startPlace.address ?: "",
                 universityId = null,
                 placeId = startPlace.id,
                 geoPoint = GeoPoint(

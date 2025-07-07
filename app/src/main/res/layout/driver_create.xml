@@ -78,7 +78,7 @@
                         android:layout_height="45dp"
                         android:background="@drawable/rounded_corners_black"
                         android:fontFamily="sans-serif"
-                        android:inputType="textEmailAddress"
+                        android:inputType="text"
                         android:padding="0dp"
                         android:textColor="@color/gray_font"
                         android:textSize="18sp" />
@@ -180,7 +180,9 @@
                         android:fontFamily="sans-serif"
                         android:padding="0dp"
                         android:textColor="@color/gray_font"
-                        android:textSize="18sp" />
+                        android:textSize="18sp"
+                        android:inputType="textCapCharacters"
+                        android:capitalize="characters" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
