@@ -7,8 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.capstone2.R
 import com.example.capstone2.adapter.RidesAdapter
 import com.example.capstone2.databinding.DriverListBinding
 import com.example.capstone2.model.Ride
@@ -23,7 +25,7 @@ class ListFragment : Fragment() {
     private lateinit var ridesAdapter: RidesAdapter
     private val db = Firebase.firestore
     private val auth = FirebaseAuth.getInstance()
-    private val TAG = "ListFragment"
+    private val tag = "ListFragment"
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,12 +40,13 @@ class ListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
         setupSwipeRefresh()
+        setupcreateRideButton()
         loadUserRides(showLoading = true, isInitialLoad = true)
     }
 
     private fun setupRecyclerView() {
         ridesAdapter = RidesAdapter { documentId, ride ->
-            showRideDetails(documentId, ride)
+            showRideDetails(documentId)
         }
         binding.ridesRecyclerView.apply {
             adapter = ridesAdapter
@@ -63,11 +66,16 @@ class ListFragment : Fragment() {
         }
     }
 
+    private fun setupcreateRideButton() {
+        binding.createRideButton.setOnClickListener {
+            findNavController().navigate(R.id.action_listFragment_to_createFragment)
+        }
+    }
+
     private fun loadUserRides(showLoading: Boolean, isInitialLoad: Boolean) {
         if (showLoading) {
             binding.progressBar.visibility = View.VISIBLE
         }
-        binding.emptyStateText.visibility = View.GONE
 
         val currentUserId = auth.currentUser?.uid ?: return
 
@@ -87,23 +95,21 @@ class ListFragment : Fragment() {
                     } ?: emptyList()
 
                     if (rides.isEmpty()) {
-                        binding.emptyStateText.visibility = View.VISIBLE
                         Toast.makeText(context, "No rides found", Toast.LENGTH_SHORT).show()
                     } else {
-                        binding.emptyStateText.visibility = View.GONE
                         ridesAdapter.submitList(rides)
                         if (!isInitialLoad) {
                             Toast.makeText(context, "Refreshed list", Toast.LENGTH_SHORT).show()
                         }
                     }
                 } else {
-                    Log.w(TAG, "Error getting rides", task.exception)
+                    Log.w(tag, "Error getting rides", task.exception)
                     Toast.makeText(context, "Error loading rides", Toast.LENGTH_SHORT).show()
                 }
             }
     }
 
-    private fun showRideDetails(documentId: String, ride: Ride) {
+    private fun showRideDetails(documentId: String) {
         Toast.makeText(context, "Selected: $documentId", Toast.LENGTH_SHORT).show()
     }
 

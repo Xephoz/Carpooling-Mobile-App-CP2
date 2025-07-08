@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.example.capstone2.R
 import com.example.capstone2.databinding.DriverCreateBinding
 import com.example.capstone2.model.LocationInfo
@@ -40,7 +41,7 @@ class CreateFragment : Fragment() {
     private val db = Firebase.firestore
     private lateinit var universities: List<University>
     private lateinit var placesClient: PlacesClient
-    private val TAG = "CreateRideFragment"
+    private val tag = "CreateRideFragment"
 
 
     override fun onCreateView(
@@ -54,7 +55,11 @@ class CreateFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this).get(CreateRideViewModel::class.java)
+        viewModel = ViewModelProvider(this)[CreateRideViewModel::class.java]
+
+        binding.toolbar.setNavigationOnClickListener {
+            navigateToList()
+        }
 
         // Initialize Places API
         if (!Places.isInitialized()) {
@@ -73,16 +78,20 @@ class CreateFragment : Fragment() {
         }
     }
 
+    private fun navigateToList() {
+        findNavController().navigate(R.id.action_createFragment_to_listFragment)
+    }
+
     private fun restoreFromViewModel() {
         // Restore starting point
         viewModel.selectedStartPlace?.let { place ->
             val placeName = place.name ?: ""
             val placeAddress = place.address ?: ""
-            val displayText = if (!placeName.isNullOrEmpty() && placeAddress.startsWith(placeName)) {
+            val displayText = if (placeName.isNotEmpty() && placeAddress.startsWith(placeName)) {
                 placeAddress
             } else {
                 listOf(placeName, placeAddress)
-                    .filter { !it.isNullOrEmpty() }
+                    .filter { it.isNotEmpty() }
                     .joinToString(" - ")
             }
 
@@ -131,11 +140,11 @@ class CreateFragment : Fragment() {
                 val place = Autocomplete.getPlaceFromIntent(data)
                 val placeName = place.name ?: ""
                 val placeAddress = place.address ?: ""
-                val displayText = if (!placeName.isNullOrEmpty() && placeAddress.startsWith(placeName)) {
+                val displayText = if (placeName.isNotEmpty() && placeAddress.startsWith(placeName)) {
                     placeAddress
                 } else {
                     listOf(placeName, placeAddress)
-                        .filter { !it.isNullOrEmpty() }
+                        .filter { it.isNotEmpty() }
                         .joinToString(" - ")
                 }
                 viewModel.selectedStartPlace = place
@@ -156,7 +165,7 @@ class CreateFragment : Fragment() {
                 setupDestinationDropdown()
             }
             .addOnFailureListener { exception ->
-                Log.e(TAG, "Error fetching universities", exception)
+                Log.e(tag, "Error fetching universities", exception)
                 Toast.makeText(context, "Failed to load universities", Toast.LENGTH_SHORT).show()
             }
     }
@@ -306,7 +315,7 @@ class CreateFragment : Fragment() {
             driverId = driverId,
             vehicleId = vehicleId,
             startLocation = LocationInfo(
-                displayName = startPlace.name ?: "Unnamed Location",
+                displayName = startPlace.name ?: "",
                 fullAddress = startPlace.address ?: "",
                 universityId = null,
                 placeId = startPlace.id,
@@ -334,7 +343,7 @@ class CreateFragment : Fragment() {
             clearForm()
         }
         .addOnFailureListener { e ->
-            Log.e(TAG, "Error creating ride", e)
+            Log.e(tag, "Error creating ride", e)
             showError("Failed to create ride: ${e.localizedMessage}")
         }
     }

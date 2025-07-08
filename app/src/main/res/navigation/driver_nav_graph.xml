@@ -6,14 +6,26 @@
     app:startDestination="@id/listFragment">
 
     <fragment
-        android:id="@+id/createFragment"
-        android:name="com.example.capstone2.main.driver.CreateFragment"
-        android:label="Create Ride"
-        tools:layout="@layout/driver_create" />
-
-    <fragment
         android:id="@+id/listFragment"
         android:name="com.example.capstone2.main.driver.ListFragment"
-        android:label="My Rides"
-        tools:layout="@layout/driver_list"/>
+        tools:layout="@layout/driver_list"
+        android:label="My Created Rides">
+
+        <action
+            android:id="@+id/action_listFragment_to_createFragment"
+            app:destination="@id/createFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/createFragment"
+        android:name="com.example.capstone2.main.driver.CreateFragment"
+        tools:layout="@layout/driver_create"
+        android:label="Create Ride">
+
+        <action
+            android:id="@+id/action_createFragment_to_listFragment"
+            app:destination="@id/listFragment"
+            app:popUpTo="@id/listFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
 </navigation>
