@@ -55,13 +55,13 @@ class CreateFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this)[CreateRideViewModel::class.java]
 
         binding.toolbar.setNavigationOnClickListener {
             navigateToList()
         }
 
-        // Initialize Places API
+        viewModel = ViewModelProvider(this)[CreateRideViewModel::class.java]
+
         if (!Places.isInitialized()) {
             val apiKey = requireContext().getString(R.string.maps_api_key)
             Places.initialize(requireContext(), apiKey)

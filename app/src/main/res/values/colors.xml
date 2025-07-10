@@ -15,6 +15,7 @@
     <color name="primary">#141C27</color>
     <color name="secondary">#384654</color>
     <color name="tertiary">#567787</color>
+    <color name="top_bar">#111720</color>
 
 <!--    https://colorffy.com/dark-theme-generator?colors=1D242B-141B26    -->
     <color name="primary_0">#1d242b</color>
