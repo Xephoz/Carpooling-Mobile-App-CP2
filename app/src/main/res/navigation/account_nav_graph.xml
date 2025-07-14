@@ -9,6 +9,6 @@
         android:id="@+id/profileFragment"
         android:name="com.example.capstone2.main.account.ProfileFragment"
         android:label="My Profile"
-        tools:layout="@layout/account_profile" />
+        tools:layout="@layout/account_profile_old" />
 
 </navigation>
