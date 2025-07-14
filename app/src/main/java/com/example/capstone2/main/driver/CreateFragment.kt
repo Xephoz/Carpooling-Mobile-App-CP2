@@ -19,7 +19,6 @@ import com.example.capstone2.model.LocationInfo
 import com.example.capstone2.model.Ride
 import com.example.capstone2.model.University
 import com.example.capstone2.viewmodels.CreateRideViewModel
-import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.PlacesClient
@@ -31,7 +30,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 
 class CreateFragment : Fragment() {
@@ -40,7 +41,7 @@ class CreateFragment : Fragment() {
     private var _binding: DriverCreateBinding? = null
     private val binding get() = _binding!!
     private val db = Firebase.firestore
-    private lateinit var universities: List<University>
+    private var universities: List<University> = emptyList()
     private lateinit var placesClient: PlacesClient
     private val tag = "CreateRideFragment"
 
@@ -63,6 +64,10 @@ class CreateFragment : Fragment() {
 
         viewModel = ViewModelProvider(this)[CreateRideViewModel::class.java]
 
+        binding.swapButton.setOnClickListener {
+            swapLocations()
+        }
+
         if (!Places.isInitialized()) {
             val apiKey = requireContext().getString(R.string.maps_api_key)
             Places.initialize(requireContext(), apiKey)
@@ -84,7 +89,30 @@ class CreateFragment : Fragment() {
     }
 
     private fun restoreFromViewModel() {
-        // Restore starting point
+        // Restore swap state first
+        if (viewModel.isSwapped) {
+            // Show swapped UI
+            binding.startLocationSearch.visibility = View.GONE
+            binding.startDropdown.visibility = View.VISIBLE
+            binding.endDropdown.visibility = View.GONE
+            binding.endLocationSearch.visibility = View.VISIBLE
+
+            // Swap the icons
+            binding.startIcon.setImageResource(R.drawable.baseline_place_24)
+            binding.endIcon.setImageResource(R.drawable.baseline_trip_origin_24)
+
+            // Setup dropdown if universities are loaded
+            if (universities.isNotEmpty()) {
+                setupStartDropdown()
+            }
+        } else {
+            // Setup dropdown if universities are loaded
+            if (universities.isNotEmpty()) {
+                setupDestinationDropdown()
+            }
+        }
+
+        // Restore starting point (handles both normal and swapped cases)
         viewModel.selectedStartPlace?.let { place ->
             val placeName = place.name ?: ""
             val placeAddress = place.address ?: ""
@@ -96,12 +124,29 @@ class CreateFragment : Fragment() {
                     .joinToString(" - ")
             }
 
-            binding.startLocationSearchInput.setText(displayText)
-            binding.startLocationSearch.hint = "Starting point selected"
+            if (viewModel.isSwapped) {
+                binding.endLocationSearchInput.setText(displayText)
+                binding.endLocationSearch.hint = "Destination selected"
+                binding.endLocationSearch.error = null
+            } else {
+                binding.startLocationSearchInput.setText(displayText)
+                binding.startLocationSearch.hint = "Starting point selected"
+                binding.startLocationSearch.error = null
+            }
+        }
+
+        // Restore university selection (handles both normal and swapped cases)
+        viewModel.selectedUniversityName?.let { universityName ->
+            if (viewModel.isSwapped) {
+                binding.startDropdownInput.setText(universityName)
+                binding.startDropdown.error = null
+            } else {
+                binding.endDropdownInput.setText(universityName)
+                binding.endDropdown.error = null
+            }
         }
 
         // Restore other fields
-        viewModel.selectedUniversityName?.let { binding.endDropdownInput.setText(it) }
         viewModel.vehicleId?.let { binding.setVehicle.setText(it) }
         viewModel.maxPassengers?.let { binding.setMaxPassengers.setText(it.toString()) }
         binding.setFemaleOnly.isChecked = viewModel.femaleOnly
@@ -109,6 +154,60 @@ class CreateFragment : Fragment() {
         // Restore date/time if selected
         if (viewModel.isDateTimeSelected) {
             updateDateTimeUI()
+        }
+    }
+
+    private fun swapLocations() {
+        viewModel.isSwapped = !viewModel.isSwapped
+
+        // Clear current values
+        binding.startLocationSearchInput.text?.clear()
+        binding.startLocationSearch.error = null
+        binding.startDropdownInput.text?.clear()
+        binding.startDropdown.error = null
+        binding.endLocationSearchInput.text?.clear()
+        binding.endLocationSearch.error = null
+        binding.endDropdownInput.text?.clear()
+        binding.endDropdown.error = null
+        viewModel.selectedStartPlace = null
+        viewModel.selectedUniversityName = null
+
+        // Update UI based on swapped state
+        if (viewModel.isSwapped) {
+            // Start becomes university dropdown
+            binding.startLocationSearch.visibility = View.GONE
+            binding.startDropdown.visibility = View.VISIBLE
+            binding.startDropdown.hint = "Select starting point"
+
+            // End becomes location autocomplete
+            binding.endDropdown.visibility = View.GONE
+            binding.endLocationSearch.visibility = View.VISIBLE
+            binding.endLocationSearch.hint = "Enter destination"
+
+            // Setup dropdown for start if universities are loaded
+            if (universities.isNotEmpty()) {
+                setupStartDropdown()
+            }
+
+            // Setup autocomplete for end
+            setupEndLocationAutocomplete()
+        } else {
+            // Restore original state
+            binding.startLocationSearch.visibility = View.VISIBLE
+            binding.startDropdown.visibility = View.GONE
+            binding.startLocationSearch.hint = "Enter starting point"
+
+            binding.endDropdown.visibility = View.VISIBLE
+            binding.endLocationSearch.visibility = View.GONE
+            binding.endDropdown.hint = "Select destination"
+
+            // Setup dropdown if universities are loaded
+            if (universities.isNotEmpty()) {
+                setupDestinationDropdown()
+            }
+
+            // Restore original autocomplete
+            setupStartLocationAutocomplete()
         }
     }
 
@@ -134,6 +233,29 @@ class CreateFragment : Fragment() {
         }
     }
 
+    private fun setupEndLocationAutocomplete() {
+        binding.endLocationSearchInput.apply {
+            isFocusable = false
+            isFocusableInTouchMode = false
+
+            setOnClickListener {
+                val autocompleteIntent = Autocomplete.IntentBuilder(
+                    AutocompleteActivityMode.OVERLAY,
+                    listOf(
+                        Place.Field.ID,
+                        Place.Field.NAME,
+                        Place.Field.LAT_LNG,
+                        Place.Field.ADDRESS
+                    )
+                )
+                    .setCountries(listOf("my"))
+                    .build(requireContext())
+
+                startActivityForResult(autocompleteIntent, AUTOCOMPLETE_REQUEST_CODE)
+            }
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == AUTOCOMPLETE_REQUEST_CODE && resultCode == RESULT_OK) {
@@ -148,10 +270,17 @@ class CreateFragment : Fragment() {
                         .filter { it.isNotEmpty() }
                         .joinToString(" - ")
                 }
+
                 viewModel.selectedStartPlace = place
-                binding.startLocationSearchInput.setText(displayText)
-                binding.startLocationSearch.hint = "Starting point selected"
-                binding.startLocationSearch.error = null
+                if (viewModel.isSwapped) {
+                    binding.endLocationSearchInput.setText(displayText)
+                    binding.endLocationSearch.hint = "Destination selected"
+                    binding.endLocationSearch.error = null
+                } else {
+                    binding.startLocationSearchInput.setText(displayText)
+                    binding.startLocationSearch.hint = "Starting point selected"
+                    binding.startLocationSearch.error = null
+                }
             }
         }
     }
@@ -163,7 +292,14 @@ class CreateFragment : Fragment() {
                 universities = result.map { document ->
                     document.toObject(University::class.java).copy(id = document.id)
                 }
-                setupDestinationDropdown()
+                // Only setup dropdown if not swapped
+                if (!viewModel.isSwapped) {
+                    setupDestinationDropdown()
+                }
+                // Setup start dropdown if swapped
+                if (viewModel.isSwapped) {
+                    setupStartDropdown()
+                }
             }
             .addOnFailureListener { exception ->
                 Log.e(tag, "Error fetching universities", exception)
@@ -184,6 +320,22 @@ class CreateFragment : Fragment() {
             viewModel.selectedUniversityName = binding.endDropdownInput.text.toString()
         }
         binding.endDropdownInput.setOnClickListener { binding.endDropdownInput.showDropDown() }
+    }
+
+    private fun setupStartDropdown() {
+        val universityNames = universities.map { it.name }
+        val adapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_dropdown_item_1line,
+            universityNames
+        )
+        binding.startDropdownInput.setAdapter(adapter)
+        binding.startDropdownInput.setOnItemClickListener { _, _, position, _ ->
+            val selectedUni = universities[position]
+            viewModel.selectedUniversityName = selectedUni.name
+            binding.startDropdown.error = null
+        }
+        binding.startDropdownInput.setOnClickListener { binding.startDropdownInput.showDropDown() }
     }
 
     private fun setupDateTimePicker() {
@@ -252,10 +404,19 @@ class CreateFragment : Fragment() {
     }
 
     private fun updateDateTimeUI() {
-        val dateFormat = android.text.format.DateFormat.getDateFormat(requireContext())
-        val timeFormat = android.text.format.DateFormat.getTimeFormat(requireContext())
-        binding.setDate.setText("${dateFormat.format(viewModel.selectedDateTime.time)} ${timeFormat.format(viewModel.selectedDateTime.time)}")
+        val formattedDateTime = formatDateTime(viewModel.selectedDateTime)
+        binding.setDate.setText(formattedDateTime)
         binding.setDate.error = null
+    }
+
+    private fun formatDateTime(calendar: Calendar): String {
+        val dateFormat = SimpleDateFormat("MMMM d, yyyy", Locale.getDefault())
+        val datePart = dateFormat.format(calendar.time)
+
+        val timeFormat = SimpleDateFormat("h:mma", Locale.getDefault())
+        val timePart = timeFormat.format(calendar.time).lowercase(Locale.getDefault())
+
+        return "$datePart at $timePart"
     }
 
     private fun createRide() {
@@ -267,19 +428,42 @@ class CreateFragment : Fragment() {
             return
         }
 
-        val startPlace = viewModel.selectedStartPlace ?: run {
-            binding.startLocationSearch.error = "Please select a starting point"
-            showError("Starting point required")
-            return
-        }
+        val startPlace: Place
+        val selectedUniversity: University
 
-        val selectedUniversityName = binding.endDropdownInput.text.toString()
-        val selectedUniversity = universities.find { it.name == selectedUniversityName } ?: run {
-            binding.endDropdown.error = "Please select a destination"
-            showError("Destination required")
-            return
+        if (!viewModel.isSwapped) {
+            // Original state
+            // Start is location autocomplete
+            startPlace = viewModel.selectedStartPlace ?: run {
+                binding.startLocationSearch.error = "Please select a starting point"
+                showError("Starting point required")
+                return
+            }
+
+            // End is university dropdown
+            val selectedUniversityName = binding.endDropdownInput.text.toString()
+            selectedUniversity = universities.find { it.name == selectedUniversityName } ?: run {
+                binding.endDropdown.error = "Please select a destination"
+                showError("Destination required")
+                return
+            }
+        } else {
+            // Swapped state
+            // Start is university dropdown
+            val selectedUniversityName = binding.startDropdownInput.text.toString()
+            selectedUniversity = universities.find { it.name == selectedUniversityName } ?: run {
+                binding.startDropdown.error = "Please select a starting point"
+                showError("Starting point required")
+                return
+            }
+
+            // End is location autocomplete
+            startPlace = viewModel.selectedStartPlace ?: run {
+                binding.endLocationSearch.error = "Please select a destination"
+                showError("Destination required")
+                return
+            }
         }
-        viewModel.selectedUniversityName = selectedUniversityName
 
         val vehicleId = binding.setVehicle.text.toString()
             .takeIf { it.isNotBlank() }
@@ -312,29 +496,58 @@ class CreateFragment : Fragment() {
 
         viewModel.femaleOnly = binding.setFemaleOnly.isChecked
 
-        val ride = Ride(
-            driverId = driverId,
-            vehicleId = vehicleId,
-            startLocation = LocationInfo(
-                displayName = startPlace.name ?: "",
-                fullAddress = startPlace.address ?: "",
-                universityId = null,
-                placeId = startPlace.id,
-                geoPoint = GeoPoint(
-                    startPlace.latLng?.latitude ?: 0.0,
-                    startPlace.latLng?.longitude ?: 0.0
-                )
-            ),
-            endLocation = LocationInfo(
-                displayName = selectedUniversity.name,
-                universityId = selectedUniversity.id,
-                placeId = selectedUniversity.placeId,
-                geoPoint = selectedUniversity.location
-            ),
-            maxPassengers = maxPassengers,
-            departureTime = Timestamp(viewModel.selectedDateTime.time),
-            femaleOnly = viewModel.femaleOnly
-        )
+        // Create the ride with proper locations based on swap state
+        val ride = if (!viewModel.isSwapped) {
+            // Normal mode: start is location, end is university
+            Ride(
+                driverId = driverId,
+                vehicleId = vehicleId,
+                startLocation = LocationInfo(
+                    displayName = startPlace.name ?: "",
+                    fullAddress = startPlace.address ?: "",
+                    universityId = null,
+                    placeId = startPlace.id,
+                    geoPoint = GeoPoint(
+                        startPlace.latLng?.latitude ?: 0.0,
+                        startPlace.latLng?.longitude ?: 0.0
+                    )
+                ),
+                endLocation = LocationInfo(
+                    displayName = selectedUniversity.name,
+                    universityId = selectedUniversity.id,
+                    placeId = selectedUniversity.placeId,
+                    geoPoint = selectedUniversity.location
+                ),
+                maxPassengers = maxPassengers,
+                departureTime = Timestamp(viewModel.selectedDateTime.time),
+                femaleOnly = viewModel.femaleOnly
+            )
+        } else {
+            // Swapped mode: start is university, end is location
+            Ride(
+                driverId = driverId,
+                vehicleId = vehicleId,
+                startLocation = LocationInfo(
+                    displayName = selectedUniversity.name,
+                    universityId = selectedUniversity.id,
+                    placeId = selectedUniversity.placeId,
+                    geoPoint = selectedUniversity.location
+                ),
+                endLocation = LocationInfo(
+                    displayName = startPlace.name ?: "",
+                    fullAddress = startPlace.address ?: "",
+                    universityId = null,
+                    placeId = startPlace.id,
+                    geoPoint = GeoPoint(
+                        startPlace.latLng?.latitude ?: 0.0,
+                        startPlace.latLng?.longitude ?: 0.0
+                    )
+                ),
+                maxPassengers = maxPassengers,
+                departureTime = Timestamp(viewModel.selectedDateTime.time),
+                femaleOnly = viewModel.femaleOnly
+            )
+        }
 
         db.collection("rides").add(ride)
             .addOnSuccessListener {
@@ -356,12 +569,23 @@ class CreateFragment : Fragment() {
     }
 
     private fun clearForm() {
-        binding.startLocationSearchInput.text?.clear()
-        binding.startLocationSearch.error = null
-        binding.startLocationSearch.hint = "Enter starting point"
+        if (viewModel.isSwapped) {
+            binding.startDropdownInput.text?.clear()
+            binding.startDropdown.error = null
+            binding.startDropdown.hint = "Select starting point"
 
-        binding.endDropdownInput.text?.clear()
-        binding.endDropdown.error = null
+            binding.endLocationSearchInput.text?.clear()
+            binding.endLocationSearch.error = null
+            binding.endLocationSearch.hint = "Enter destination"
+        } else {
+            binding.startLocationSearchInput.text?.clear()
+            binding.startLocationSearch.error = null
+            binding.startLocationSearch.hint = "Enter starting point"
+
+            binding.endDropdownInput.text?.clear()
+            binding.endDropdown.error = null
+            binding.endDropdown.hint = "Select destination"
+        }
 
         binding.setVehicle.text?.clear()
         binding.setVehicle.error = null

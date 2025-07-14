@@ -13,6 +13,8 @@ class CreateRideViewModel : ViewModel() {
     var maxPassengers: Int? = null
     var femaleOnly: Boolean = false
 
+    var isSwapped = false
+
     fun clear() {
         selectedStartPlace = null
         selectedDateTime = Calendar.getInstance()
@@ -21,5 +23,7 @@ class CreateRideViewModel : ViewModel() {
         vehicleId = null
         maxPassengers = null
         femaleOnly = false
+
+        isSwapped = false
     }
 }

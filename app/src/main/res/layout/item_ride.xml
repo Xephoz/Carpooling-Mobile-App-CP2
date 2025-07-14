@@ -39,7 +39,7 @@
                 android:id="@+id/arrowText"
                 android:layout_width="wrap_content"
                 android:layout_height="26dp"
-                android:paddingRight="4dp"
+                android:paddingEnd="4dp"
                 android:src="@drawable/baseline_arrow_right_alt_24"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
@@ -91,8 +91,8 @@
                 android:layout_height="wrap_content"
                 android:text="Female Only"
                 android:textColor="@color/white"
-                android:drawableStart="@drawable/baseline_female_24"
                 android:visibility="visible"
+                app:drawableStartCompat="@drawable/baseline_female_24"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/passengersText"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
