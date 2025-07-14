@@ -71,23 +71,22 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
-                    <com.google.android.material.textfield.TextInputEditText
+                    <AutoCompleteTextView
                         android:id="@+id/setStart"
                         android:layout_width="match_parent"
                         android:layout_height="45dp"
                         android:background="@drawable/rounded_corners_black"
                         android:fontFamily="sans-serif"
-                        android:inputType="text"
+                        android:inputType="none"
                         android:padding="0dp"
                         android:textColor="@color/gray_font"
                         android:textSize="18sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <ImageView
-                    android:id="@+id/vertIcon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/baseline_more_vert_24"
+                    android:src="@drawable/baseline_triple_dot_24"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/startBox"
                     app:layout_constraintTop_toBottomOf="@id/startIcon"
@@ -132,7 +131,9 @@
                         android:inputType="none"
                         android:padding="0dp"
                         android:textColor="@color/gray_font"
-                        android:textSize="18sp" />
+                        android:textSize="18sp"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <ImageView
