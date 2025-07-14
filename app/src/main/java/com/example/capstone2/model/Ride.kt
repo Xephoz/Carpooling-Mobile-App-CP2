@@ -14,9 +14,7 @@ data class Ride(
     var maxPassengers: Int = 0,
     var passengers: List<String> = emptyList(),
     var femaleOnly: Boolean = false
-) {
-    constructor() : this("", "", LocationInfo(), LocationInfo(), Timestamp.now(), Timestamp.now(), 1, emptyList(), false)
-}
+)
 
 
 @IgnoreExtraProperties

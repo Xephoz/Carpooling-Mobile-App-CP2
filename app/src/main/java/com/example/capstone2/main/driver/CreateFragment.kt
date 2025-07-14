@@ -19,6 +19,7 @@ import com.example.capstone2.model.LocationInfo
 import com.example.capstone2.model.Ride
 import com.example.capstone2.model.University
 import com.example.capstone2.viewmodels.CreateRideViewModel
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.PlacesClient
@@ -95,12 +96,12 @@ class CreateFragment : Fragment() {
                     .joinToString(" - ")
             }
 
-            binding.setStart.setText(displayText)
-            binding.startBox.hint = "Starting point selected"
+            binding.startLocationSearchInput.setText(displayText)
+            binding.startLocationSearch.hint = "Starting point selected"
         }
 
         // Restore other fields
-        viewModel.selectedUniversityName?.let { binding.setEnd.setText(it) }
+        viewModel.selectedUniversityName?.let { binding.endDropdownInput.setText(it) }
         viewModel.vehicleId?.let { binding.setVehicle.setText(it) }
         viewModel.maxPassengers?.let { binding.setMaxPassengers.setText(it.toString()) }
         binding.setFemaleOnly.isChecked = viewModel.femaleOnly
@@ -112,7 +113,7 @@ class CreateFragment : Fragment() {
     }
 
     private fun setupStartLocationAutocomplete() {
-        binding.setStart.apply {
+        binding.startLocationSearchInput.apply {
             isFocusable = false
             isFocusableInTouchMode = false
 
@@ -148,9 +149,9 @@ class CreateFragment : Fragment() {
                         .joinToString(" - ")
                 }
                 viewModel.selectedStartPlace = place
-                binding.setStart.setText(displayText)
-                binding.startBox.hint = "Starting point selected"
-                binding.startBox.error = null
+                binding.startLocationSearchInput.setText(displayText)
+                binding.startLocationSearch.hint = "Starting point selected"
+                binding.startLocationSearch.error = null
             }
         }
     }
@@ -177,12 +178,12 @@ class CreateFragment : Fragment() {
             android.R.layout.simple_dropdown_item_1line,
             universityNames
         )
-        binding.setEnd.setAdapter(adapter)
-        binding.setEnd.setOnItemClickListener { _, _, _, _ ->
-            binding.endBox.error = null
-            viewModel.selectedUniversityName = binding.setEnd.text.toString()
+        binding.endDropdownInput.setAdapter(adapter)
+        binding.endDropdownInput.setOnItemClickListener { _, _, _, _ ->
+            binding.endDropdown.error = null
+            viewModel.selectedUniversityName = binding.endDropdownInput.text.toString()
         }
-        binding.setEnd.setOnClickListener { binding.setEnd.showDropDown() }
+        binding.endDropdownInput.setOnClickListener { binding.endDropdownInput.showDropDown() }
     }
 
     private fun setupDateTimePicker() {
@@ -267,14 +268,14 @@ class CreateFragment : Fragment() {
         }
 
         val startPlace = viewModel.selectedStartPlace ?: run {
-            binding.startBox.error = "Please select a starting point"
+            binding.startLocationSearch.error = "Please select a starting point"
             showError("Starting point required")
             return
         }
 
-        val selectedUniversityName = binding.setEnd.text.toString()
+        val selectedUniversityName = binding.endDropdownInput.text.toString()
         val selectedUniversity = universities.find { it.name == selectedUniversityName } ?: run {
-            binding.endBox.error = "Please select a destination"
+            binding.endDropdown.error = "Please select a destination"
             showError("Destination required")
             return
         }
@@ -336,16 +337,16 @@ class CreateFragment : Fragment() {
         )
 
         db.collection("rides").add(ride)
-        .addOnSuccessListener {
-            binding.createProgressBar.visibility = View.GONE
-            binding.createButton.isEnabled = true
-            Toast.makeText(context, "Ride created!", Toast.LENGTH_SHORT).show()
-            clearForm()
-        }
-        .addOnFailureListener { e ->
-            Log.e(tag, "Error creating ride", e)
-            showError("Failed to create ride: ${e.localizedMessage}")
-        }
+            .addOnSuccessListener {
+                binding.createProgressBar.visibility = View.GONE
+                binding.createButton.isEnabled = true
+                Toast.makeText(context, "Ride created!", Toast.LENGTH_SHORT).show()
+                clearForm()
+            }
+            .addOnFailureListener { e ->
+                Log.e(tag, "Error creating ride", e)
+                showError("Failed to create ride: ${e.localizedMessage}")
+            }
     }
 
     private fun showError(message: String) {
@@ -355,12 +356,12 @@ class CreateFragment : Fragment() {
     }
 
     private fun clearForm() {
-        binding.setStart.text?.clear()
-        binding.startBox.error = null
-        binding.startBox.hint = "Enter starting point"
+        binding.startLocationSearchInput.text?.clear()
+        binding.startLocationSearch.error = null
+        binding.startLocationSearch.hint = "Enter starting point"
 
-        binding.setEnd.text?.clear()
-        binding.endBox.error = null
+        binding.endDropdownInput.text?.clear()
+        binding.endDropdown.error = null
 
         binding.setVehicle.text?.clear()
         binding.setVehicle.error = null
@@ -383,5 +384,3 @@ class CreateFragment : Fragment() {
         private const val AUTOCOMPLETE_REQUEST_CODE = 1001
     }
 }
-
-// 20011656@imail.sunway.edu.my

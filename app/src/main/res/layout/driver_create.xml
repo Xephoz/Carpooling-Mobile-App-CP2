@@ -56,32 +56,66 @@
                     app:tint="@color/primary_3"
                     android:layout_marginTop="16dp"/>
 
-                <com.google.android.material.textfield.TextInputLayout
+                <RelativeLayout
                     android:id="@+id/startBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:hint="Enter starting point"
-                    android:textColorHint="@color/gray_font"
-                    app:hintTextColor="@color/white"
                     android:layout_marginStart="40dp"
                     android:layout_marginEnd="5dp"
-                    app:errorEnabled="true"
-                    app:boxBackgroundMode="outline"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/setStart"
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/startLocationSearch"
                         android:layout_width="match_parent"
-                        android:layout_height="45dp"
-                        android:background="@drawable/rounded_corners_black"
-                        android:fontFamily="sans-serif"
-                        android:inputType="text"
-                        android:padding="0dp"
-                        android:textColor="@color/gray_font"
-                        android:textSize="18sp" />
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:layout_height="wrap_content"
+                        android:hint="Set starting point"
+                        android:textColorHint="@color/gray_font"
+                        app:hintTextColor="@color/white"
+                        app:errorEnabled="true"
+                        app:boxBackgroundMode="outline"
+                        android:visibility="visible">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/startLocationSearchInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="45dp"
+                            android:background="@drawable/rounded_corners_black"
+                            android:fontFamily="sans-serif"
+                            android:inputType="text"
+                            android:padding="0dp"
+                            android:textColor="@color/gray_font"
+                            android:textSize="18sp"
+                            />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+                        android:id="@+id/startDropdown"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColorHint="@color/gray_font"
+                        app:hintEnabled="true"
+                        app:hintTextColor="@color/white"
+                        app:errorEnabled="true"
+                        app:errorIconTint="@android:color/transparent"
+                        app:endIconTint="@color/primary_5"
+                        app:boxBackgroundMode="outline"
+                        android:visibility="gone">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/startDropdownInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="45dp"
+                            android:background="@drawable/rounded_corners_black"
+                            android:hint="Set starting point"
+                            android:inputType="none"
+                            android:padding="0dp"
+                            android:textColor="@color/gray_font"
+                            android:textSize="18sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </RelativeLayout>
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -104,40 +138,69 @@
                     app:tint="@color/primary_3"
                     android:layout_marginTop="13dp"/>
 
-                <com.google.android.material.textfield.TextInputLayout
+                <RelativeLayout
                     android:id="@+id/endBox"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="40dp"
-                    android:textColorHint="@color/gray_font"
-                    app:hintEnabled="true"
-                    app:hintTextColor="@color/white"
-                    app:errorEnabled="true"
-                    app:errorIconTint="@android:color/transparent"
-                    app:endIconTint="@color/primary_5"
-                    app:boxBackgroundMode="outline"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/startBox"
                     app:layout_constraintBottom_toBottomOf="parent">
 
-                    <AutoCompleteTextView
-                        android:id="@+id/setEnd"
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+                        android:id="@+id/endDropdown"
                         android:layout_width="match_parent"
-                        android:layout_height="45dp"
-                        android:background="@drawable/rounded_corners_black"
-                        android:hint="Select destination"
-                        android:inputType="none"
-                        android:padding="0dp"
-                        android:textColor="@color/gray_font"
-                        android:textSize="18sp"
-                        android:focusable="false"
-                        android:focusableInTouchMode="false" />
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:layout_height="wrap_content"
+                        android:textColorHint="@color/gray_font"
+                        app:hintEnabled="true"
+                        app:hintTextColor="@color/white"
+                        app:errorEnabled="true"
+                        app:errorIconTint="@android:color/transparent"
+                        app:endIconTint="@color/primary_5"
+                        app:boxBackgroundMode="outline"
+                        android:visibility="visible">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/endDropdownInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="45dp"
+                            android:background="@drawable/rounded_corners_black"
+                            android:hint="Set destination"
+                            android:inputType="none"
+                            android:padding="0dp"
+                            android:textColor="@color/gray_font"
+                            android:textSize="18sp"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/endLocationSearch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Set destination"
+                        android:textColorHint="@color/gray_font"
+                        app:hintTextColor="@color/white"
+                        app:errorEnabled="true"
+                        app:boxBackgroundMode="outline"
+                        android:visibility="gone">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/endLocationSearchInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="45dp"
+                            android:background="@drawable/rounded_corners_black"
+                            android:fontFamily="sans-serif"
+                            android:inputType="text"
+                            android:padding="0dp"
+                            android:textColor="@color/gray_font"
+                            android:textSize="18sp"
+                            />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </RelativeLayout>
 
                 <ImageView
-                    android:id="@+id/swapIcon"
+                    android:id="@+id/swapButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/baseline_import_export_24"
@@ -282,5 +345,3 @@
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-<!--20011656@imail.sunway.edu.my-->
