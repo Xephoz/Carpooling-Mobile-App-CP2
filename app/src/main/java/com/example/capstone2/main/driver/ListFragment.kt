@@ -51,12 +51,6 @@ class ListFragment : Fragment() {
         binding.ridesRecyclerView.apply {
             adapter = ridesAdapter
             layoutManager = LinearLayoutManager(requireContext())
-            addItemDecoration(
-                DividerItemDecoration(
-                    requireContext(),
-                    LinearLayoutManager.VERTICAL
-                )
-            )
         }
     }
 

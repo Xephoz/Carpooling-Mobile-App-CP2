@@ -20,7 +20,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="Create a Ride"
+            app:title="My Profile"
             app:titleTextColor="@color/white"
             app:titleCentered="true" />
     </com.google.android.material.appbar.AppBarLayout>
@@ -75,7 +75,7 @@
         android:layout_height="match_parent"
         android:fillViewport="true"
         android:layout_marginTop="150dp"
-        android:layout_marginBottom="56dp"
+        android:layout_marginBottom="80dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -247,7 +247,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
                 android:layout_marginHorizontal="30dp"
-                android:layout_marginBottom="56dp"
+                android:layout_marginBottom="20dp"
                 android:background="@drawable/rounded_corners_profile_button"
                 android:gravity="center"
                 android:text="Save Changes"
