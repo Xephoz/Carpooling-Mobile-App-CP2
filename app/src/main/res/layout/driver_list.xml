@@ -17,7 +17,7 @@
             android:id="@+id/appBarLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/top_bar"
+            android:background="@color/surface_0"
             android:elevation="16dp"
             app:elevation="16dp"
             app:layout_constraintTop_toTopOf="parent"

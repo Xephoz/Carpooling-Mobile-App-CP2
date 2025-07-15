@@ -25,236 +25,244 @@
             app:titleCentered="true" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <View
-            android:id="@+id/viewTop"
-            android:layout_width="match_parent"
-            android:layout_height="10dp"
-            android:background="@color/surface_1"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"/>
-
-        <View
-            android:id="@+id/viewBottom"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:background="@color/surface_1"
-            app:layout_constraintTop_toBottomOf="@id/viewTop"
-            app:layout_constraintStart_toStartOf="parent"/>
-
-        <ImageView
-            android:id="@+id/avatarFrame"
-            android:layout_width="160dp"
-            android:layout_height="160dp"
-            android:contentDescription="Frame for avatar"
-            android:src="@drawable/baseline_circle_100"
-            app:layout_constraintTop_toTopOf="@id/avatar"
-            app:layout_constraintBottom_toBottomOf="@id/avatar"
-            app:layout_constraintStart_toStartOf="@id/avatar"
-            app:layout_constraintEnd_toEndOf="@id/avatar"/>
-
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/avatar"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:src="@drawable/avatar"
-            android:scaleType="centerCrop"
-            app:shapeAppearanceOverlay="@style/CircularImageView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/viewBottom"/>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
     <!-- Scrollable Content -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
-        android:layout_marginTop="150dp"
         android:layout_marginBottom="80dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
-            android:id="@+id/profileLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="20dp"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/firstNameTitle"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
-                android:layout_gravity="center_vertical"
-                android:text="First Name"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                android:textStyle="bold"/>
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                app:hintEnabled="false"
-                app:boxBackgroundMode="outline">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/firstNameBox"
+                <View
+                    android:id="@+id/viewTop"
                     android:layout_width="match_parent"
-                    android:layout_height="45dp"
-                    android:background="@drawable/rounded_corners_profile_field"
-                    android:inputType="textPersonName"
-                    android:hint="eg. John"
-                    android:textColorHint="@color/surface_5"
-                    android:padding="0dp"
-                    android:textColor="@color/white"
-                    android:textSize="18sp"/>
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_height="10dp"
+                    android:background="@color/surface_1"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"/>
 
-            <TextView
-                android:id="@+id/lastNameTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
-                android:layout_gravity="center_vertical"
-                android:text="Last Name"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                android:textStyle="bold"/>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                app:hintEnabled="false"
-                app:boxBackgroundMode="outline">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/lastNameBox"
+                <View
+                    android:id="@+id/viewBottom"
                     android:layout_width="match_parent"
-                    android:layout_height="45dp"
-                    android:background="@drawable/rounded_corners_profile_field"
-                    android:inputType="textPersonName"
-                    android:hint="eg. Wick"
-                    android:textColorHint="@color/surface_5"
-                    android:padding="0dp"
-                    android:textColor="@color/white"
-                    android:textSize="18sp" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_height="60dp"
+                    android:background="@color/surface_1"
+                    app:layout_constraintTop_toBottomOf="@id/viewTop"
+                    app:layout_constraintStart_toStartOf="parent"/>
 
-            <TextView
-                android:id="@+id/emailTitle"
+                <ImageView
+                    android:id="@+id/avatarFrame"
+                    android:layout_width="160dp"
+                    android:layout_height="160dp"
+                    android:contentDescription="Frame for avatar"
+                    android:src="@drawable/baseline_circle_100"
+                    app:layout_constraintTop_toTopOf="@id/avatar"
+                    app:layout_constraintBottom_toBottomOf="@id/avatar"
+                    app:layout_constraintStart_toStartOf="@id/avatar"
+                    app:layout_constraintEnd_toEndOf="@id/avatar"/>
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/avatar"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:src="@drawable/avatar"
+                    android:scaleType="centerCrop"
+                    app:shapeAppearanceOverlay="@style/CircularImageView"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/viewBottom"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
-                android:layout_gravity="center_vertical"
-                android:text="Email"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                android:textStyle="bold"/>
+                android:layout_marginHorizontal="20dp"
+                android:orientation="vertical">
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                app:hintEnabled="false"
-                app:boxBackgroundMode="outline">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/emailBox"
+                <TextView
+                    android:id="@+id/firstNameTitle"
                     android:layout_width="match_parent"
-                    android:layout_height="45dp"
-                    android:background="@drawable/rounded_corners_profile_field"
-                    android:inputType="textEmailAddress"
-                    android:hint="eg. example@gmail.com"
-                    android:textColorHint="@color/surface_5"
-                    android:padding="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="2dp"
+                    android:layout_gravity="center_vertical"
+                    android:text="First Name"
                     android:textColor="@color/white"
-                    android:textSize="18sp" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
 
-            <TextView
-                android:id="@+id/phoneTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
-                android:layout_gravity="center_vertical"
-                android:text="Phone Number"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                android:textStyle="bold"/>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                app:hintEnabled="false"
-                app:boxBackgroundMode="outline">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/phoneBox"
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
-                    android:layout_height="45dp"
-                    android:background="@drawable/rounded_corners_profile_field"
-                    android:inputType="phone|number"
-                    android:hint="eg. 60123456789"
-                    android:textColorHint="@color/surface_5"
-                    android:padding="0dp"
-                    android:textColor="@color/white"
-                    android:textSize="18sp" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    app:hintEnabled="false"
+                    app:boxBackgroundMode="outline">
 
-            <TextView
-                android:id="@+id/genderTitleTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
-                android:layout_gravity="center_vertical"
-                android:text="Gender"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                android:textStyle="bold"/>
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/firstNameBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="45dp"
+                        android:background="@drawable/rounded_corners_profile_field"
+                        android:inputType="textPersonName"
+                        android:hint="eg. John"
+                        android:textColorHint="@color/surface_5"
+                        android:padding="0dp"
+                        android:textColor="@color/white"
+                        android:textSize="18sp"/>
+                </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="40dp"
-                app:hintEnabled="false"
-                app:endIconTint="@color/primary_5"
-                app:boxBackgroundMode="outline">
-
-                <AutoCompleteTextView
-                    android:id="@+id/genderBox"
+                <TextView
+                    android:id="@+id/lastNameTitle"
                     android:layout_width="match_parent"
-                    android:layout_height="45dp"
-                    android:background="@drawable/rounded_corners_profile_field"
-                    android:inputType="none"
-                    android:hint="eg. Male"
-                    android:textColorHint="@color/surface_5"
-                    android:padding="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="2dp"
+                    android:layout_gravity="center_vertical"
+                    android:text="Last Name"
                     android:textColor="@color/white"
-                    android:textSize="18sp" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/updateButton"
-                android:layout_width="match_parent"
-                android:layout_height="55dp"
-                android:layout_marginHorizontal="30dp"
-                android:layout_marginBottom="20dp"
-                android:background="@drawable/rounded_corners_profile_button"
-                android:gravity="center"
-                android:text="Save Changes"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                android:enabled="false"/>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    app:hintEnabled="false"
+                    app:boxBackgroundMode="outline">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/lastNameBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="45dp"
+                        android:background="@drawable/rounded_corners_profile_field"
+                        android:inputType="textPersonName"
+                        android:hint="eg. Wick"
+                        android:textColorHint="@color/surface_5"
+                        android:padding="0dp"
+                        android:textColor="@color/white"
+                        android:textSize="18sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:id="@+id/emailTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="2dp"
+                    android:layout_gravity="center_vertical"
+                    android:text="Email"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    app:hintEnabled="false"
+                    app:boxBackgroundMode="outline">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/emailBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="45dp"
+                        android:background="@drawable/rounded_corners_profile_field"
+                        android:inputType="textEmailAddress"
+                        android:hint="eg. example@gmail.com"
+                        android:textColorHint="@color/surface_5"
+                        android:padding="0dp"
+                        android:textColor="@color/white"
+                        android:textSize="18sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:id="@+id/phoneTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="2dp"
+                    android:layout_gravity="center_vertical"
+                    android:text="Phone Number"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    app:hintEnabled="false"
+                    app:boxBackgroundMode="outline">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/phoneBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="45dp"
+                        android:background="@drawable/rounded_corners_profile_field"
+                        android:inputType="phone|number"
+                        android:hint="eg. 60123456789"
+                        android:textColorHint="@color/surface_5"
+                        android:padding="0dp"
+                        android:textColor="@color/white"
+                        android:textSize="18sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:id="@+id/genderTitleTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="2dp"
+                    android:layout_gravity="center_vertical"
+                    android:text="Gender"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="40dp"
+                    app:hintEnabled="false"
+                    app:endIconTint="@color/primary_5"
+                    app:boxBackgroundMode="outline">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/genderBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="45dp"
+                        android:background="@drawable/rounded_corners_profile_field"
+                        android:inputType="none"
+                        android:hint="eg. Male"
+                        android:textColorHint="@color/surface_5"
+                        android:padding="0dp"
+                        android:textColor="@color/white"
+                        android:textSize="18sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/updateButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_marginHorizontal="30dp"
+                    android:layout_marginBottom="20dp"
+                    android:background="@drawable/rounded_corners_profile_button"
+                    android:gravity="center"
+                    android:text="Save Changes"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:enabled="false"/>
+            </LinearLayout>
+
+
         </LinearLayout>
+
+
     </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
