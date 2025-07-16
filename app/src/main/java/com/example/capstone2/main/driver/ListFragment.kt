@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.capstone2.R
 import com.example.capstone2.adapter.RidesAdapter
@@ -38,6 +37,7 @@ class ListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        view.clearFocus()
         setupRecyclerView()
         setupSwipeRefresh()
         setupcreateRideButton()
@@ -71,6 +71,11 @@ class ListFragment : Fragment() {
             binding.progressBar.visibility = View.VISIBLE
         }
 
+        // Clear existing data immediately when refreshing
+        if (!isInitialLoad) {
+            ridesAdapter.submitList(emptyList())
+        }
+
         val currentUserId = auth.currentUser?.uid ?: return
 
         db.collection("rides")
@@ -89,6 +94,7 @@ class ListFragment : Fragment() {
                     } ?: emptyList()
 
                     if (rides.isEmpty()) {
+                        ridesAdapter.submitList(emptyList()) // Ensure empty state
                         Toast.makeText(context, "No rides found", Toast.LENGTH_SHORT).show()
                     } else {
                         ridesAdapter.submitList(rides)
@@ -102,7 +108,7 @@ class ListFragment : Fragment() {
                 }
             }
     }
-
+    
     private fun showRideDetails(documentId: String) {
         Toast.makeText(context, "Selected: $documentId", Toast.LENGTH_SHORT).show()
     }

@@ -275,7 +275,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:clickable="true"
-                    android:focusable="true"
+                    android:focusable="false"
                     android:hint="Select departure time"
                     android:textColorHint="@color/gray_font"
                     app:boxBackgroundMode="none"
@@ -292,6 +292,7 @@
                         android:drawablePadding="10dp"
                         android:fontFamily="sans-serif"
                         android:inputType="none"
+                        android:cursorVisible="false"
                         android:padding="0dp"
                         android:textColor="@color/gray_font"
                         android:textSize="18sp" />
