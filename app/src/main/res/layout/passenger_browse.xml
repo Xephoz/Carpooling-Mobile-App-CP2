@@ -17,7 +17,7 @@
             android:id="@+id/appBarLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/top_bar"
+            android:background="@color/surface_0"
             android:elevation="16dp"
             app:elevation="16dp"
             app:layout_constraintTop_toTopOf="parent"
@@ -35,26 +35,49 @@
 
         <com.google.android.material.search.SearchBar
             android:id="@+id/searchBar"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_marginHorizontal="10dp"
-            android:elevation="16dp"
+            android:layout_marginHorizontal="20dp"
+            android:elevation="10dp"
             android:hint="Search rides..."
             style="@style/Widget.Material3.SearchBar"
-            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.SmallComponent"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.RoundedComponent"
             app:layout_constraintTop_toBottomOf="@id/appBarLayout"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:elevation="16dp"
+            android:background="@color/surface_0"
+            app:layout_constraintStart_toStartOf="@id/sortButton"
+            app:layout_constraintTop_toTopOf="@id/sortButton"
+            app:layout_constraintBottom_toBottomOf="@id/sortButton"/>
+
+        <ImageView
+            android:id="@+id/sortButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="13dp"
+            android:elevation="16dp"
+            android:src="@drawable/baseline_sort_30"
+            android:layout_marginEnd="20dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:tint="@color/primary_5"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/searchBar"
+            app:layout_constraintBottom_toBottomOf="@id/searchBar"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/ridesRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:clipToPadding="false"
+            android:layout_marginTop="5dp"
             android:layout_marginBottom="80dp"
-            android:paddingTop="5dp"
-            android:paddingBottom="0dp"
             android:paddingHorizontal="20dp"
             android:elevation="5dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"

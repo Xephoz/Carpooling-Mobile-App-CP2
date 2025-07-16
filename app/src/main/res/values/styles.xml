@@ -10,4 +10,9 @@
         <item name="hintTextColor">@color/gray_font</item>
     </style>
 
+    <style name="ShapeAppearance.Material3.RoundedComponent" parent="ShapeAppearance.Material3.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">25%</item> <!-- This makes it fully rounded -->
+    </style>
+
 </resources>

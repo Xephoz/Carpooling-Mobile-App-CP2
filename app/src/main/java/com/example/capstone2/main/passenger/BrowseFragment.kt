@@ -1,60 +1,115 @@
 package com.example.capstone2.main.passenger
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.capstone2.R
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.capstone2.adapter.RidesAdapter
+import com.example.capstone2.databinding.PassengerBrowseBinding
+import com.example.capstone2.model.Ride
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.Timestamp
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [BrowseFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class BrowseFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private var _binding: PassengerBrowseBinding? = null
+    private val binding get() = _binding!!
+    private lateinit var ridesAdapter: RidesAdapter
+    private val db = Firebase.firestore
+    private val auth = FirebaseAuth.getInstance()
+    private val tag = "BrowseFragment"
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = PassengerBrowseBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupRecyclerView()
+        setupSwipeRefresh()
+        setupSearchBar()
+        loadRides(showLoading = true, isInitialLoad = true)
+    }
+
+    private fun setupRecyclerView() {
+        ridesAdapter = RidesAdapter { documentId, ride ->
+            showRideDetails(documentId, ride)
+        }
+        binding.ridesRecyclerView.apply {
+            adapter = ridesAdapter
+            layoutManager = LinearLayoutManager(requireContext())
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.passenger_browse, container, false)
+    private fun setupSwipeRefresh() {
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            loadRides(showLoading = false, isInitialLoad = false)
+        }
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment BrowseFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            BrowseFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    private fun setupSearchBar() {
+        binding.searchBar.setOnClickListener {
+            // Implement search functionality here if needed
+        }
+    }
+
+    private fun loadRides(showLoading: Boolean, isInitialLoad: Boolean) {
+        if (showLoading) {
+            binding.progressBar.visibility = View.VISIBLE
+        }
+
+        val currentUserId = auth.currentUser?.uid ?: return
+        val currentTime = Timestamp.now()
+
+        db.collection("rides")
+            .whereNotEqualTo("driverId", currentUserId) // Exclude current user's rides
+            .whereGreaterThan("departureTime", currentTime) // Only future rides
+            .orderBy("departureTime", Query.Direction.ASCENDING) // Order by nearest first
+            .get()
+            .addOnCompleteListener { task ->
+                binding.progressBar.visibility = View.GONE
+                binding.swipeRefreshLayout.isRefreshing = false
+
+                if (task.isSuccessful) {
+                    val rides = task.result?.documents?.mapNotNull { doc ->
+                        doc.toObject(Ride::class.java)?.let { ride ->
+                            doc.id to ride
+                        }
+                    } ?: emptyList()
+
+                    if (rides.isEmpty()) {
+                        Toast.makeText(context, "No upcoming rides found", Toast.LENGTH_SHORT).show()
+                    } else {
+                        ridesAdapter.submitList(rides)
+                        if (!isInitialLoad) {
+                            Toast.makeText(context, "Refreshed list", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } else {
+                    Log.w(tag, "Error getting rides", task.exception)
+                    Toast.makeText(context, "Error loading rides", Toast.LENGTH_SHORT).show()
                 }
             }
+    }
+
+    private fun showRideDetails(documentId: String, ride: Ride) {
+        // Implement navigation to ride details or show a dialog
+        Toast.makeText(context, "Selected ride to: ${ride.endLocation.displayName}", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
