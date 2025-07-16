@@ -47,15 +47,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
-        <View
-            android:layout_width="1dp"
-            android:layout_height="0dp"
-            android:elevation="16dp"
-            android:background="@color/surface_0"
-            app:layout_constraintStart_toStartOf="@id/sortButton"
-            app:layout_constraintTop_toTopOf="@id/sortButton"
-            app:layout_constraintBottom_toBottomOf="@id/sortButton"/>
-
         <ImageView
             android:id="@+id/sortButton"
             android:layout_width="wrap_content"
@@ -63,13 +54,36 @@
             android:padding="13dp"
             android:elevation="16dp"
             android:src="@drawable/baseline_sort_30"
+            android:clickable="true"
+            android:focusable="true"
+            app:tint="@color/primary_5"
+            app:layout_constraintEnd_toStartOf="@id/dateButton"
+            app:layout_constraintTop_toTopOf="@id/searchBar"
+            app:layout_constraintBottom_toBottomOf="@id/searchBar"/>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:elevation="16dp"
+            android:background="@color/surface_0"
+            app:layout_constraintStart_toStartOf="@id/dateButton"
+            app:layout_constraintTop_toTopOf="@id/dateButton"
+            app:layout_constraintBottom_toBottomOf="@id/dateButton"/>
+
+        <ImageView
+            android:id="@+id/dateButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:elevation="16dp"
+            android:src="@drawable/outline_calendar_month_24"
             android:layout_marginEnd="20dp"
             android:clickable="true"
             android:focusable="true"
             app:tint="@color/primary_5"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/searchBar"
-            app:layout_constraintBottom_toBottomOf="@id/searchBar"/>
+            app:layout_constraintBottom_toBottomOf="@id/searchBar" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/ridesRecyclerView"
