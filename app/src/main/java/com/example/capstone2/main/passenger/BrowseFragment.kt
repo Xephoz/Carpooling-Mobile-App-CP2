@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -31,15 +32,6 @@ class BrowseFragment : Fragment() {
     private val tag = "BrowseFragment"
     private var currentLocation: GeoPoint? = null
 
-    companion object {
-        private const val LOCATION_PERMISSION_REQUEST_CODE = 1001
-        private val REQUIRED_PERMISSIONS = arrayOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        )
-    }
-
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -55,13 +47,13 @@ class BrowseFragment : Fragment() {
         setupSwipeRefresh()
         setupSearchBar()
         setupSortButton()
-        // Check permissions before getting location
+
         if (hasLocationPermissions()) {
             getCurrentLocation(shouldLoadRides = true)
-            loadRides(showLoading = true, isInitialLoad = true)
         } else {
             requestLocationPermissions()
         }
+        loadRides(showLoading = true, isInitialLoad = true)
     }
 
     private fun setupRecyclerView() {
@@ -87,13 +79,15 @@ class BrowseFragment : Fragment() {
     private fun showLocationPermissionExplanation() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Enable Location")
-            .setMessage("Allow location access to see nearby rides first.")
+            .setMessage("Allow location access to sort rides by your location.")
             .setPositiveButton("Allow") { _, _ ->
                 requestLocationPermissions()
             }
             .setNegativeButton("Later") { _, _ ->
                 binding.swipeRefreshLayout.isRefreshing = false
                 loadRides(showLoading = false, isInitialLoad = false)
+                // Show the refreshed toast here
+                Toast.makeText(context, "Refreshed list", Toast.LENGTH_SHORT).show()
             }
             .setOnDismissListener {
                 binding.swipeRefreshLayout.isRefreshing = false
@@ -110,7 +104,6 @@ class BrowseFragment : Fragment() {
 
     private fun setupSortButton() {
         binding.sortButton.setOnClickListener {
-            // Implement sorting options if needed
             Toast.makeText(context, "Sort options coming soon", Toast.LENGTH_SHORT).show()
         }
     }
@@ -122,23 +115,26 @@ class BrowseFragment : Fragment() {
     }
 
     private fun requestLocationPermissions() {
-        requestPermissions(REQUIRED_PERMISSIONS, LOCATION_PERMISSION_REQUEST_CODE)
+        // Simple direct request without rationale check for initial load
+        locationPermissionRequest.launch(REQUIRED_PERMISSIONS)
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            LOCATION_PERMISSION_REQUEST_CODE -> {
-                binding.swipeRefreshLayout.isRefreshing = false
-                if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
-                    getCurrentLocation(shouldLoadRides = true)
-                } else {
-                    loadRides(showLoading = false, isInitialLoad = false)
-                }
+    private val REQUIRED_PERMISSIONS = arrayOf(
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION
+    )
+
+    private val locationPermissionRequest = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        binding.swipeRefreshLayout.isRefreshing = false
+        when {
+            permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) ||
+                    permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
+                getCurrentLocation(shouldLoadRides = true)
+            }
+            else -> {
+                loadRides(showLoading = false, isInitialLoad = false)
             }
         }
     }
@@ -185,7 +181,7 @@ class BrowseFragment : Fragment() {
         }
     }
 
-    private fun loadRides(showLoading: Boolean, isInitialLoad: Boolean) {
+    private fun loadRides(showLoading: Boolean, isInitialLoad: Boolean, showRefreshToast: Boolean = false) {
         if (showLoading && !binding.swipeRefreshLayout.isRefreshing) {
             binding.progressBar.visibility = View.VISIBLE
         }
@@ -237,7 +233,8 @@ class BrowseFragment : Fragment() {
                         Toast.makeText(context, "No available rides found", Toast.LENGTH_SHORT).show()
                     } else {
                         ridesAdapter.submitList(sortedRides)
-                        if (wasRefreshing) {  // Only show if it was a refresh action
+                        // Show toast if it was a refresh action OR explicitly requested
+                        if (wasRefreshing || showRefreshToast) {
                             Toast.makeText(context, "Refreshed list", Toast.LENGTH_SHORT).show()
                         }
                     }
