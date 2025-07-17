@@ -59,7 +59,7 @@ class CreateFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.toolbar.setNavigationOnClickListener {
-            navigateToList()
+            findNavController().navigateUp()
         }
 
         viewModel = ViewModelProvider(this)[CreateRideViewModel::class.java]
@@ -82,10 +82,6 @@ class CreateFragment : Fragment() {
         binding.createButton.setOnClickListener {
             createRide()
         }
-    }
-
-    private fun navigateToList() {
-        findNavController().navigate(R.id.action_createFragment_to_listFragment)
     }
 
     private fun restoreFromViewModel() {
@@ -179,7 +175,7 @@ class CreateFragment : Fragment() {
             binding.startDropdown.visibility = View.VISIBLE
             binding.startDropdown.hint = "Select starting point"
 
-            // End becomes location autocomplete
+            // End becomes geoPoint autocomplete
             binding.endDropdown.visibility = View.GONE
             binding.endLocationSearch.visibility = View.VISIBLE
             binding.endLocationSearch.hint = "Enter destination"
@@ -433,7 +429,7 @@ class CreateFragment : Fragment() {
 
         if (!viewModel.isSwapped) {
             // Original state
-            // Start is location autocomplete
+            // Start is geoPoint autocomplete
             startPlace = viewModel.selectedStartPlace ?: run {
                 binding.startLocationSearch.error = "Please select a starting point"
                 showError("Starting point required")
@@ -457,7 +453,7 @@ class CreateFragment : Fragment() {
                 return
             }
 
-            // End is location autocomplete
+            // End is geoPoint autocomplete
             startPlace = viewModel.selectedStartPlace ?: run {
                 binding.endLocationSearch.error = "Please select a destination"
                 showError("Destination required")
@@ -498,7 +494,7 @@ class CreateFragment : Fragment() {
 
         // Create the ride with proper locations based on swap state
         val ride = if (!viewModel.isSwapped) {
-            // Normal mode: start is location, end is university
+            // Normal mode: start is geoPoint, end is university
             Ride(
                 driverId = driverId,
                 vehicleId = vehicleId,
@@ -516,14 +512,14 @@ class CreateFragment : Fragment() {
                     displayName = selectedUniversity.name,
                     universityId = selectedUniversity.id,
                     placeId = selectedUniversity.placeId,
-                    geoPoint = selectedUniversity.location
+                    geoPoint = selectedUniversity.geoPoint
                 ),
                 maxPassengers = maxPassengers,
                 departureTime = Timestamp(viewModel.selectedDateTime.time),
                 femaleOnly = viewModel.femaleOnly
             )
         } else {
-            // Swapped mode: start is university, end is location
+            // Swapped mode: start is university, end is geoPoint
             Ride(
                 driverId = driverId,
                 vehicleId = vehicleId,
@@ -531,7 +527,7 @@ class CreateFragment : Fragment() {
                     displayName = selectedUniversity.name,
                     universityId = selectedUniversity.id,
                     placeId = selectedUniversity.placeId,
-                    geoPoint = selectedUniversity.location
+                    geoPoint = selectedUniversity.geoPoint
                 ),
                 endLocation = LocationInfo(
                     displayName = startPlace.name ?: "",

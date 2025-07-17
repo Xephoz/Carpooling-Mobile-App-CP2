@@ -112,43 +112,34 @@
                         app:layout_constraintTop_toBottomOf="@id/line2"
                         app:tint="@color/primary_4" />
 
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/startCard"
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/startLocation"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="82dp"
                         android:layout_marginStart="10dp"
+                        android:scrollbars="vertical"
+                        android:text="Pearl Residence Mahkota Cheras - 1, Jalan Mutiara 3/2, Bandar Mahkota Cheras"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Title"
                         android:backgroundTint="@color/surface_1"
                         app:cardBackgroundColor="@color/surface_1"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/startIcon"
-                        app:layout_constraintTop_toBottomOf="@id/tripInfo">
+                        app:layout_constraintTop_toBottomOf="@id/tripInfo"/>
 
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="82dp"
-                            android:scrollbars="vertical"
-                            android:text="Pearl Residence Mahkota Cheras - 1, Jalan Mutiara 3/2, Bandar Mahkota Cheras"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Title" />
-                    </androidx.cardview.widget.CardView>
-
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/endCard"
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/endLocation"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="82dp"
                         android:layout_marginStart="10dp"
+                        android:layout_marginTop="-2dp"
+                        android:scrollbars="vertical"
+                        android:text="Sunway University"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Title"
                         android:backgroundTint="@color/surface_1"
                         app:cardBackgroundColor="@color/surface_1"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/startIcon"
-                        app:layout_constraintTop_toTopOf="@id/endIcon">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="82dp"
-                            android:layout_marginTop="-2dp"
-                            android:text="Sunway University"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Title" />
-                    </androidx.cardview.widget.CardView>
+                        app:layout_constraintTop_toTopOf="@id/endIcon"/>
 
                     <View
                         android:id="@+id/tripBorder"
@@ -158,7 +149,7 @@
                         android:background="@color/surface_3"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/endCard" />
+                        app:layout_constraintTop_toBottomOf="@id/endLocation" />
 
                     <ImageView
                         android:id="@+id/dateIcon"

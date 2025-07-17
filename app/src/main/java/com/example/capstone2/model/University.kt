@@ -8,5 +8,5 @@ data class University(
     val id: String = "",
     val placeId: String? = null,
     val name: String = "",
-    val location: GeoPoint = GeoPoint(0.0, 0.0)
+    val geoPoint: GeoPoint = GeoPoint(0.0, 0.0)
 )

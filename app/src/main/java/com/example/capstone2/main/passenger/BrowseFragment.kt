@@ -87,7 +87,7 @@ class BrowseFragment : Fragment() {
     private fun showLocationPermissionExplanation() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Enable Location")
-            .setMessage("Allow location access to sort rides by your location.")
+            .setMessage("Allow location access to sort rides by your current location.")
             .setPositiveButton("Allow") { _, _ ->
                 requestLocationPermissions()
             }
@@ -198,7 +198,7 @@ class BrowseFragment : Fragment() {
             }, 5000)
 
         } catch (e: SecurityException) {
-            Log.e(tag, "Security Exception when getting location", e)
+            Log.e(tag, "Security Exception when getting geoPoint", e)
             binding.swipeRefreshLayout.isRefreshing = false
             getLastKnownLocation(locationClient, shouldLoadRides)
         }
@@ -214,14 +214,14 @@ class BrowseFragment : Fragment() {
                 }
             } ?: run {
                 binding.swipeRefreshLayout.isRefreshing = false
-                Toast.makeText(context, "Unable to get location", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Unable to get geoPoint", Toast.LENGTH_SHORT).show()
                 if (shouldLoadRides) {
                     loadRides(showLoading = false, isInitialLoad = false)
                 }
             }
         }.addOnFailureListener { e ->
             binding.swipeRefreshLayout.isRefreshing = false
-            Log.e(tag, "Error getting last known location", e)
+            Log.e(tag, "Error getting last known geoPoint", e)
             if (shouldLoadRides) {
                 loadRides(showLoading = false, isInitialLoad = false)
             }
@@ -229,6 +229,8 @@ class BrowseFragment : Fragment() {
     }
 
     private fun loadRides(showLoading: Boolean, isInitialLoad: Boolean, showRefreshToast: Boolean = false) {
+        if (!isAdded) return
+
         if (showLoading && !binding.swipeRefreshLayout.isRefreshing) {
             binding.progressBar.visibility = View.VISIBLE
         }
