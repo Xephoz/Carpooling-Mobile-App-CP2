@@ -115,8 +115,11 @@ class BrowseFragment : Fragment() {
     }
 
     private fun requestLocationPermissions() {
-        // Simple direct request without rationale check for initial load
-        locationPermissionRequest.launch(REQUIRED_PERMISSIONS)
+        if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+            showLocationPermissionExplanation() // Show explanation if user denied before
+        } else {
+            locationPermissionRequest.launch(REQUIRED_PERMISSIONS) // Direct request otherwise
+        }
     }
 
     private val REQUIRED_PERMISSIONS = arrayOf(
