@@ -161,15 +161,16 @@
         <FrameLayout
             android:id="@+id/registerButtonContainer"
             android:layout_width="match_parent"
-            android:layout_height="55dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="80dp"
             android:layout_gravity="center">
 
-            <androidx.appcompat.widget.AppCompatButton
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/registerButton"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/rounded_corners_black"
+                android:layout_height="65dp"
+                android:backgroundTint="@color/black"
+                app:cornerRadius="15dp"
                 android:text="Register"
                 android:textAllCaps="false"
                 android:textColor="@color/white"

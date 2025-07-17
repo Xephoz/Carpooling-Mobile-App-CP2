@@ -121,11 +121,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/baseline_triple_dot_24"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/startBox"
-                    app:layout_constraintTop_toBottomOf="@id/startIcon"
                     app:layout_constraintBottom_toTopOf="@id/endIcon"
-                    app:tint="@color/primary_3"/>
+                    app:layout_constraintEnd_toStartOf="@id/startBox"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/startIcon"
+                    app:tint="@color/primary_3" />
 
                 <ImageView
                     android:id="@+id/endIcon"
@@ -316,13 +316,14 @@
                     android:layout_marginBottom="20dp"
                     android:layout_gravity="bottom">
 
-                    <androidx.appcompat.widget.AppCompatButton
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/createButton"
                         android:layout_width="match_parent"
-                        android:layout_height="55dp"
-                        android:background="@drawable/rounded_corners_black"
-                        android:elevation="8dp"
-                        android:foreground="@drawable/button_border"
+                        android:layout_height="65dp"
+                        android:backgroundTint="@color/black"
+                        app:strokeColor="@color/surface_3"
+                        app:strokeWidth="1dp"
+                        app:cornerRadius="15dp"
                         android:text="Create Ride"
                         android:textAllCaps="false"
                         android:textColor="@color/white"

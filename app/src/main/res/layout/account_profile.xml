@@ -76,7 +76,7 @@
                     android:layout_height="120dp"
                     android:src="@drawable/avatar"
                     android:scaleType="centerCrop"
-                    app:shapeAppearanceOverlay="@style/CircularImageView"
+                    app:shapeAppearanceOverlay="@style/CircleFrame"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="@id/viewBottom"/>

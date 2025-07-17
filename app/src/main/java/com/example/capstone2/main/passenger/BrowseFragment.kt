@@ -3,12 +3,15 @@ package com.example.capstone2.main.passenger
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,12 +19,17 @@ import com.example.capstone2.adapter.RidesAdapter
 import com.example.capstone2.databinding.PassengerBrowseBinding
 import com.example.capstone2.extension.distanceTo
 import com.example.capstone2.model.Ride
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.android.gms.location.Priority
 
 class BrowseFragment : Fragment() {
     private var _binding: PassengerBrowseBinding? = null
@@ -58,7 +66,7 @@ class BrowseFragment : Fragment() {
 
     private fun setupRecyclerView() {
         ridesAdapter = RidesAdapter { documentId, ride ->
-            showRideDetails(documentId, ride)
+            showRideDetails(ride)
         }
         binding.ridesRecyclerView.apply {
             adapter = ridesAdapter
@@ -86,7 +94,6 @@ class BrowseFragment : Fragment() {
             .setNegativeButton("Later") { _, _ ->
                 binding.swipeRefreshLayout.isRefreshing = false
                 loadRides(showLoading = false, isInitialLoad = false)
-                // Show the refreshed toast here
                 Toast.makeText(context, "Refreshed list", Toast.LENGTH_SHORT).show()
             }
             .setOnDismissListener {
@@ -98,13 +105,14 @@ class BrowseFragment : Fragment() {
 
     private fun setupSearchBar() {
         binding.searchBar.setOnClickListener {
-            // Implement search functionality here if needed
+            // TO-DO
         }
     }
 
     private fun setupSortButton() {
         binding.sortButton.setOnClickListener {
             Toast.makeText(context, "Sort options coming soon", Toast.LENGTH_SHORT).show()
+            // TO-DO
         }
     }
 
@@ -116,9 +124,9 @@ class BrowseFragment : Fragment() {
 
     private fun requestLocationPermissions() {
         if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-            showLocationPermissionExplanation() // Show explanation if user denied before
+            showLocationPermissionExplanation()
         } else {
-            locationPermissionRequest.launch(REQUIRED_PERMISSIONS) // Direct request otherwise
+            locationPermissionRequest.launch(REQUIRED_PERMISSIONS)
         }
     }
 
@@ -152,32 +160,68 @@ class BrowseFragment : Fragment() {
         }
 
         val locationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-        try {
-            locationClient.lastLocation
-                .addOnSuccessListener { location ->
-                    location?.let {
-                        currentLocation = GeoPoint(it.latitude, it.longitude)
-                        if (shouldLoadRides) {
-                            loadRides(showLoading = false, isInitialLoad = false)
-                        }
-                    } ?: run {
-                        binding.swipeRefreshLayout.isRefreshing = false
-                        Toast.makeText(context, "Unable to get location", Toast.LENGTH_SHORT).show()
-                        if (shouldLoadRides) {
-                            loadRides(showLoading = false, isInitialLoad = false)
-                        }
-                    }
-                }
-                .addOnFailureListener { e ->
-                    binding.swipeRefreshLayout.isRefreshing = false
-                    Log.e(tag, "Error getting location", e)
+
+        val locationCallback = object : LocationCallback() {
+            @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
+            override fun onLocationResult(result: LocationResult) {
+                locationClient.removeLocationUpdates(this)
+                result.lastLocation?.let {
+                    currentLocation = GeoPoint(it.latitude, it.longitude)
                     if (shouldLoadRides) {
                         loadRides(showLoading = false, isInitialLoad = false)
                     }
+                    return
                 }
+                getLastKnownLocation(locationClient, shouldLoadRides)
+            }
+        }
+
+        try {
+            val locationRequest = LocationRequest.Builder(
+                Priority.PRIORITY_HIGH_ACCURACY,
+                5000
+            ).apply {
+                setMinUpdateIntervalMillis(5000)
+                setMaxUpdates(1)
+                setWaitForAccurateLocation(true)
+            }.build()
+
+            locationClient.requestLocationUpdates(
+                locationRequest,
+                locationCallback,
+                Looper.getMainLooper()
+            )
+
+            Handler(Looper.getMainLooper()).postDelayed({
+                locationClient.removeLocationUpdates(locationCallback)
+                getLastKnownLocation(locationClient, shouldLoadRides)
+            }, 5000)
+
         } catch (e: SecurityException) {
-            binding.swipeRefreshLayout.isRefreshing = false
             Log.e(tag, "Security Exception when getting location", e)
+            binding.swipeRefreshLayout.isRefreshing = false
+            getLastKnownLocation(locationClient, shouldLoadRides)
+        }
+    }
+
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
+    private fun getLastKnownLocation(client: FusedLocationProviderClient, shouldLoadRides: Boolean) {
+        client.lastLocation.addOnSuccessListener { location ->
+            location?.let {
+                currentLocation = GeoPoint(it.latitude, it.longitude)
+                if (shouldLoadRides) {
+                    loadRides(showLoading = false, isInitialLoad = false)
+                }
+            } ?: run {
+                binding.swipeRefreshLayout.isRefreshing = false
+                Toast.makeText(context, "Unable to get location", Toast.LENGTH_SHORT).show()
+                if (shouldLoadRides) {
+                    loadRides(showLoading = false, isInitialLoad = false)
+                }
+            }
+        }.addOnFailureListener { e ->
+            binding.swipeRefreshLayout.isRefreshing = false
+            Log.e(tag, "Error getting last known location", e)
             if (shouldLoadRides) {
                 loadRides(showLoading = false, isInitialLoad = false)
             }
@@ -254,7 +298,7 @@ class BrowseFragment : Fragment() {
         val distance: Float
     )
 
-    private fun showRideDetails(documentId: String, ride: Ride) {
+    private fun showRideDetails(ride: Ride) {
         Toast.makeText(context, "Selected ride to: ${ride.endLocation.displayName}", Toast.LENGTH_SHORT).show()
     }
 

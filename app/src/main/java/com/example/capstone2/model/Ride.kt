@@ -4,14 +4,12 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.IgnoreExtraProperties
 
-// First, define the status enum class (put this in a separate file or at top level)
 enum class RideStatus {
     ACTIVE,
     ONGOING,
     COMPLETED
 }
 
-// Then update your Ride data class
 data class Ride(
     var driverId: String = "",
     var vehicleId: String = "",
@@ -24,7 +22,6 @@ data class Ride(
     var femaleOnly: Boolean = false,
     var status: RideStatus = RideStatus.ACTIVE  // Default value is ACTIVE
 ) {
-    // Add this no-arg constructor for Firebase compatibility
     constructor() : this(
         driverId = "",
         vehicleId = "",
@@ -47,6 +44,5 @@ data class LocationInfo(
     var placeId: String? = null,
     var geoPoint: GeoPoint = GeoPoint(0.0, 0.0)
 ) {
-    // No-arg constructor for Firebase
     constructor() : this("", "", null, null, GeoPoint(0.0, 0.0))
 }

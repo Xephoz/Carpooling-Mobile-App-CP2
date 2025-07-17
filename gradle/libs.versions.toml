@@ -21,7 +21,6 @@ firebaseFirestoreKtx = "25.1.4"
 firebaseFirestore = "25.1.4"
 googleAndroidLibrariesMapsplatformSecretsGradlePlugin = "2.0.1"
 material3 = "1.3.2"
-materialVersion = "1.12.0"
 navigationFragmentKtx = "2.9.1"
 navigationUiKtx = "2.9.1"
 places = "4.3.1"
@@ -59,7 +58,6 @@ filament-android = { group = "com.google.ar.sceneform", name = "filament-android
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
 google-firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
-material-v1110 = { module = "com.google.android.material:material", version.ref = "materialVersion" }
 material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 places = { module = "com.google.android.libraries.places:places", version.ref = "places" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
