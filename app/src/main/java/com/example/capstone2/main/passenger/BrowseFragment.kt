@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.capstone2.adapter.RidesAdapter
 import com.example.capstone2.databinding.PassengerBrowseBinding
@@ -30,6 +31,7 @@ import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.android.gms.location.Priority
+import kotlinx.coroutines.launch
 
 class BrowseFragment : Fragment() {
     private var _binding: PassengerBrowseBinding? = null
@@ -56,12 +58,14 @@ class BrowseFragment : Fragment() {
         setupSearchBar()
         setupSortButton()
 
-        if (hasLocationPermissions()) {
-            getCurrentLocation(shouldLoadRides = true)
-        } else {
-            requestLocationPermissions()
+        viewLifecycleOwner.lifecycleScope.launch {
+            if (hasLocationPermissions()) {
+                getCurrentLocation(shouldLoadRides = true)
+            } else {
+                requestLocationPermissions()
+            }
+            loadRides(showLoading = true, isInitialLoad = true)
         }
-        loadRides(showLoading = true, isInitialLoad = true)
     }
 
     private fun setupRecyclerView() {
@@ -229,7 +233,7 @@ class BrowseFragment : Fragment() {
     }
 
     private fun loadRides(showLoading: Boolean, isInitialLoad: Boolean, showRefreshToast: Boolean = false) {
-        if (!isAdded) return
+        if (!isAdded || isDetached) return
 
         if (showLoading && !binding.swipeRefreshLayout.isRefreshing) {
             binding.progressBar.visibility = View.VISIBLE
