@@ -13,8 +13,10 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.capstone2.adapter.RidesAdapter
 import com.example.capstone2.databinding.PassengerBrowseBinding
@@ -32,6 +34,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.android.gms.location.Priority
 import kotlinx.coroutines.launch
+import com.example.capstone2.R
 
 class BrowseFragment : Fragment() {
     private var _binding: PassengerBrowseBinding? = null
@@ -70,7 +73,7 @@ class BrowseFragment : Fragment() {
 
     private fun setupRecyclerView() {
         ridesAdapter = RidesAdapter { documentId, ride ->
-            showRideDetails(ride)
+            showRideDetails(documentId)
         }
         binding.ridesRecyclerView.apply {
             adapter = ridesAdapter
@@ -304,8 +307,9 @@ class BrowseFragment : Fragment() {
         val distance: Float
     )
 
-    private fun showRideDetails(ride: Ride) {
-        Toast.makeText(context, "Selected ride to: ${ride.endLocation.displayName}", Toast.LENGTH_SHORT).show()
+    private fun showRideDetails(rideId: String) {
+        val bundle = bundleOf("rideId" to rideId)
+        findNavController().navigate(R.id.rideDetailsFragment, bundle)
     }
 
     override fun onDestroyView() {

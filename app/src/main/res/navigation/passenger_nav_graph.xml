@@ -17,4 +17,15 @@
         android:label="Selected Rides"
         tools:layout="@layout/passenger_selected"/>
 
+    <fragment
+        android:id="@+id/rideDetailsFragment"
+        android:name="com.example.capstone2.main.passenger.RideDetailsFragment"
+        android:label="Ride Details"
+        tools:layout="@layout/passenger_ride_details">
+        <argument
+            android:name="rideId"
+            android:defaultValue=""
+            app:argType="string" />
+    </fragment>
+
 </navigation>

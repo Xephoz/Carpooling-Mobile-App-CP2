@@ -1,8 +1,7 @@
 package com.example.capstone2.model
 
 data class Vehicle(
-    val vehicleId: String = "",             // Auto-generated ID
-    val ownerId: String = "",               // Corresponds to UserProfile.uid
+    val driverId: String = "",               // Corresponds to UserProfile.uid
     val carNumber: String = "",
     val carModel: String = "",
     val carBrand: String = "",
