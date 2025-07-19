@@ -25,6 +25,5 @@ class AccountTabFragment : Fragment() {
             .findFragmentById(R.id.account_nav_host) as NavHostFragment
         val navController = navHostFragment.navController
 
-        // Setup any navigation UI specific to account section
     }
 }

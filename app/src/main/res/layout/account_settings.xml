@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/surface_0"
+    android:fitsSystemWindows="true">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/surface_0"
+        android:elevation="16dp"
+        app:elevation="16dp">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="Account Settings"
+            app:titleTextColor="@color/white"
+            app:titleCentered="true"/>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- 2. Scrollable Content -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:isScrollContainer="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:layout_marginBottom="80dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:orientation="vertical">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/profileContainer"
+                android:paddingVertical="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/profileIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/baseline_person_24"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/profileTitle"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/profileTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="50dp"
+                    android:text="Profile"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/profileDesc"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Update your personal information"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="@color/primary_5"
+                    app:layout_constraintStart_toStartOf="@id/profileTitle"
+                    app:layout_constraintTop_toBottomOf="@id/profileTitle"/>
+
+                <ImageView
+                    android:id="@+id/profileArrow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:paddingHorizontal="20dp"
+                    android:src="@drawable/baseline_arrow_forward_ios_24"
+                    app:tint="@color/primary_5"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                app:dividerColor="@color/primary_4"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/registerContainer"
+                android:paddingVertical="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/addIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="24dp"
+                    android:src="@drawable/add_car_48"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/registerTitle"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/registerTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="50dp"
+                    android:text="Add vehicle"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/registerDesc"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Register a car for driving trips"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="@color/primary_5"
+                    app:layout_constraintStart_toStartOf="@id/registerTitle"
+                    app:layout_constraintTop_toBottomOf="@id/registerTitle"/>
+
+                <ImageView
+                    android:id="@+id/registerArrow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:paddingHorizontal="20dp"
+                    android:src="@drawable/baseline_arrow_forward_ios_24"
+                    app:tint="@color/primary_5"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                app:dividerColor="@color/primary_4"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/vehicleContainer"
+                android:paddingVertical="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/vehicleIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="24dp"
+                    android:src="@drawable/car_48"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/vehicleTitle"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/vehicleTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="50dp"
+                    android:text="My vehicles"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/vehicleDesc"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="View or delete registered cars"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="@color/primary_5"
+                    app:layout_constraintStart_toStartOf="@id/vehicleTitle"
+                    app:layout_constraintTop_toBottomOf="@id/vehicleTitle"/>
+
+                <ImageView
+                    android:id="@+id/vehicleArrow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:paddingHorizontal="20dp"
+                    android:src="@drawable/baseline_arrow_forward_ios_24"
+                    app:tint="@color/primary_5"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                app:dividerColor="@color/primary_4"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="20dp"
+                android:layout_marginHorizontal="15dp"
+                android:paddingVertical="10dp"
+                android:paddingHorizontal="35dp"
+                android:text="Log Out"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textStyle="bold"
+                android:textColor="@color/red"
+                />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
