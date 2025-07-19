@@ -93,6 +93,12 @@ class BrowseFragment : Fragment() {
                 loadRides(showLoading = true, isInitialLoad = true)
             }
         }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.isLoading.collect { isLoading ->
+                binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+            }
+        }
     }
 
     private fun setupRecyclerView() {
@@ -265,12 +271,12 @@ class BrowseFragment : Fragment() {
     private fun loadRides(showLoading: Boolean, isInitialLoad: Boolean, showRefreshToast: Boolean = false) {
         if (!isAdded || isDetached) return
 
-        if (showLoading && !binding.swipeRefreshLayout.isRefreshing) {
-            binding.progressBar.visibility = View.VISIBLE
+        if (showLoading) {
+            viewModel.setLoading(true)
         }
 
         val currentUserId = auth.currentUser?.uid ?: run {
-            binding.progressBar.visibility = View.GONE
+            viewModel.setLoading(false)
             binding.swipeRefreshLayout.isRefreshing = false
             return
         }
@@ -286,7 +292,7 @@ class BrowseFragment : Fragment() {
             .whereEqualTo("status", "ACTIVE")
             .get()
             .addOnCompleteListener { task ->
-                binding.progressBar.visibility = View.GONE
+                viewModel.setLoading(false)
                 val wasRefreshing = binding.swipeRefreshLayout.isRefreshing
                 binding.swipeRefreshLayout.isRefreshing = false
 

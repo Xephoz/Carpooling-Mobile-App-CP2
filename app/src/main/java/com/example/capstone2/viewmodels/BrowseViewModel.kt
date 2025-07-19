@@ -14,11 +14,18 @@ class BrowseViewModel : ViewModel() {
     private val _currentLocation = MutableStateFlow<GeoPoint?>(null)
     val currentLocation: StateFlow<GeoPoint?> = _currentLocation.asStateFlow()
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
     fun setRides(rides: List<Pair<String, Ride>>) {
         _rides.value = rides
     }
 
     fun setCurrentLocation(location: GeoPoint?) {
         _currentLocation.value = location
+    }
+
+    fun setLoading(isLoading: Boolean) {
+        _isLoading.value = isLoading
     }
 }
