@@ -15,6 +15,7 @@ import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -35,6 +36,7 @@ import com.google.firebase.ktx.Firebase
 import com.google.android.gms.location.Priority
 import kotlinx.coroutines.launch
 import com.example.capstone2.R
+import com.example.capstone2.viewmodels.BrowseViewModel
 
 class BrowseFragment : Fragment() {
     private var _binding: PassengerBrowseBinding? = null
@@ -44,6 +46,7 @@ class BrowseFragment : Fragment() {
     private val auth = FirebaseAuth.getInstance()
     private val tag = "BrowseFragment"
     private var currentLocation: GeoPoint? = null
+    private val viewModel: BrowseViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,6 +54,11 @@ class BrowseFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = PassengerBrowseBinding.inflate(inflater, container, false)
+
+        ridesAdapter = RidesAdapter { documentId, _ ->
+            showRideDetails(documentId)
+        }
+
         return binding.root
     }
 
@@ -61,23 +69,42 @@ class BrowseFragment : Fragment() {
         setupSearchBar()
         setupSortButton()
 
+        // Observe ViewModel state
         viewLifecycleOwner.lifecycleScope.launch {
-            if (hasLocationPermissions()) {
-                getCurrentLocation(shouldLoadRides = true)
-            } else {
-                requestLocationPermissions()
+            viewModel.rides.collect { rides ->
+                ridesAdapter.submitList(rides)
             }
-            loadRides(showLoading = true, isInitialLoad = true)
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.currentLocation.collect { location ->
+                currentLocation = location
+            }
+        }
+
+        // Only load data if we don't have it already
+        if (viewModel.rides.value.isEmpty()) {
+            viewLifecycleOwner.lifecycleScope.launch {
+                if (hasLocationPermissions()) {
+                    getCurrentLocation(shouldLoadRides = true)
+                } else {
+                    requestLocationPermissions()
+                }
+                loadRides(showLoading = true, isInitialLoad = true)
+            }
         }
     }
 
     private fun setupRecyclerView() {
-        ridesAdapter = RidesAdapter { documentId, ride ->
-            showRideDetails(documentId)
-        }
         binding.ridesRecyclerView.apply {
             adapter = ridesAdapter
             layoutManager = LinearLayoutManager(requireContext())
+            setHasFixedSize(true)
+            layoutManager?.let {
+                if (it is LinearLayoutManager) {
+                    it.recycleChildrenOnDetach = true
+                }
+            }
         }
     }
 
@@ -94,7 +121,7 @@ class BrowseFragment : Fragment() {
     private fun showLocationPermissionExplanation() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Enable Location")
-            .setMessage("Allow location access to sort rides by your current location.")
+            .setMessage("Allow location access to sort rides by your current location. You may need to enable it through settings if this dialog reappears after selecting 'Allow'")
             .setPositiveButton("Allow") { _, _ ->
                 requestLocationPermissions()
             }
@@ -112,14 +139,14 @@ class BrowseFragment : Fragment() {
 
     private fun setupSearchBar() {
         binding.searchBar.setOnClickListener {
-            // TO-DO
+            // TODO: Implement search functionality
         }
     }
 
     private fun setupSortButton() {
         binding.sortButton.setOnClickListener {
             Toast.makeText(context, "Sort options coming soon", Toast.LENGTH_SHORT).show()
-            // TO-DO
+            // TODO: Implement list filter
         }
     }
 
@@ -283,6 +310,10 @@ class BrowseFragment : Fragment() {
                     } else {
                         rides.sortedBy { (_, ride) -> ride.departureTime }
                     }
+
+                    // Save to ViewModel
+                    viewModel.setRides(sortedRides)
+                    viewModel.setCurrentLocation(localLocation)
 
                     if (sortedRides.isEmpty()) {
                         ridesAdapter.submitList(emptyList())

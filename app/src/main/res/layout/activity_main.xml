@@ -20,6 +20,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="@color/surface_1"
+        android:elevation="16dp"
+        app:elevation="16dp"
         app:menu="@menu/bottom_nav_menu"
         app:itemTextColor="@color/primary_5"
         app:itemIconTint="@color/primary_5"
