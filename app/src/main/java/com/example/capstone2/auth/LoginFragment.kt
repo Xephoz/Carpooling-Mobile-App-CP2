@@ -107,9 +107,6 @@ class LoginFragment : Fragment() {
             compareEmail(userEmail)
             dialog.dismiss()
         }
-        view.findViewById<View>(R.id.resetBack).setOnClickListener {
-            dialog.dismiss()
-        }
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.show()
     }

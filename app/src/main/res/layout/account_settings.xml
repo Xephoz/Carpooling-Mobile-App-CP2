@@ -94,7 +94,7 @@
                 app:dividerColor="@color/primary_4"/>
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/registerContainer"
+                android:id="@+id/addVehicleContainer"
                 android:paddingVertical="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -105,12 +105,12 @@
                     android:layout_height="24dp"
                     android:src="@drawable/add_car_48"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/registerTitle"
+                    app:layout_constraintEnd_toStartOf="@id/addVehicleTitle"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"/>
 
                 <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/registerTitle"
+                    android:id="@+id/addVehicleTitle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="50dp"
@@ -121,17 +121,17 @@
                     app:layout_constraintTop_toTopOf="parent"/>
 
                 <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/registerDesc"
+                    android:id="@+id/addVehicleDesc"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:text="Register a car for driving trips"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small"
                     android:textColor="@color/primary_5"
-                    app:layout_constraintStart_toStartOf="@id/registerTitle"
-                    app:layout_constraintTop_toBottomOf="@id/registerTitle"/>
+                    app:layout_constraintStart_toStartOf="@id/addVehicleTitle"
+                    app:layout_constraintTop_toBottomOf="@id/addVehicleTitle"/>
 
                 <ImageView
-                    android:id="@+id/registerArrow"
+                    android:id="@+id/addVehicleArrow"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:paddingHorizontal="20dp"
@@ -149,23 +149,23 @@
                 app:dividerColor="@color/primary_4"/>
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/vehicleContainer"
+                android:id="@+id/myVehiclesContainer"
                 android:paddingVertical="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <ImageView
-                    android:id="@+id/vehicleIcon"
+                    android:id="@+id/myVehiclesIcon"
                     android:layout_width="wrap_content"
                     android:layout_height="24dp"
                     android:src="@drawable/car_48"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/vehicleTitle"
+                    app:layout_constraintEnd_toStartOf="@id/myVehiclesTitle"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"/>
 
                 <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/vehicleTitle"
+                    android:id="@+id/myVehiclesTitle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="50dp"
@@ -176,17 +176,17 @@
                     app:layout_constraintTop_toTopOf="parent"/>
 
                 <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/vehicleDesc"
+                    android:id="@+id/myVehiclesDesc"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:text="View or delete registered cars"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small"
                     android:textColor="@color/primary_5"
-                    app:layout_constraintStart_toStartOf="@id/vehicleTitle"
-                    app:layout_constraintTop_toBottomOf="@id/vehicleTitle"/>
+                    app:layout_constraintStart_toStartOf="@id/myVehiclesTitle"
+                    app:layout_constraintTop_toBottomOf="@id/myVehiclesTitle"/>
 
                 <ImageView
-                    android:id="@+id/vehicleArrow"
+                    android:id="@+id/myVehiclesArrow"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:paddingHorizontal="20dp"
@@ -204,6 +204,7 @@
                 app:dividerColor="@color/primary_4"/>
 
             <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/logoutButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -219,6 +220,4 @@
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

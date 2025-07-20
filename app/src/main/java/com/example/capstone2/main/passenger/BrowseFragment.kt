@@ -101,6 +101,7 @@ class BrowseFragment : Fragment() {
         }
     }
 
+    // TODO: Add pagination
     private fun setupRecyclerView() {
         binding.ridesRecyclerView.apply {
             adapter = ridesAdapter
