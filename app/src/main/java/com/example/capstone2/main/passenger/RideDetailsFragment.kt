@@ -7,7 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.capstone2.R
+import com.example.capstone2.adapter.PassengersAdapter
 import com.example.capstone2.databinding.PassengerRideDetailsBinding
 import com.example.capstone2.model.Gender
 import com.example.capstone2.model.RequestStatus
@@ -21,10 +24,12 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.text.SimpleDateFormat
 import java.util.Locale
+import java.util.TimeZone
 
 class RideDetailsFragment : Fragment() {
     private var _binding: PassengerRideDetailsBinding? = null
     private val binding get() = _binding!!
+    private lateinit var passengersAdapter: PassengersAdapter
     private val db = Firebase.firestore
     private val auth = FirebaseAuth.getInstance()
 
@@ -54,6 +59,7 @@ class RideDetailsFragment : Fragment() {
 
         setupToolbar()
         loadRideDetails()
+        setupPassengersRecyclerView()
         setupRequestButton()
     }
 
@@ -95,14 +101,28 @@ class RideDetailsFragment : Fragment() {
             }
     }
 
+    private fun setupPassengersRecyclerView() {
+        binding.passengersRecyclerView.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            passengersAdapter = PassengersAdapter()
+            adapter = passengersAdapter
+            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+        }
+    }
+
     private fun updateRideUI() {
         binding.startLocation.text = ride.startLocation.displayName
         binding.endLocation.text = ride.endLocation.displayName
 
-        // TODO: Format date
-        val dateFormat = SimpleDateFormat("MMMM d, yyyy 'at' h:mm a", Locale.getDefault())
-        val localTime = ride.departureTime.toDate().toString() // Simple conversion for now
-        binding.dateText.text = localTime
+        val date = ride.departureTime.toDate()
+
+        val dateFormat = SimpleDateFormat("MMMM d, yyyy 'at' h:mm a", Locale.getDefault()).apply {
+            timeZone = TimeZone.getDefault()
+        }
+
+        binding.dateText.text = dateFormat.format(date)
+            .replace(" AM", " AM")
+            .replace(" PM", " PM")
 
         binding.passengerText.text = "${ride.passengers.size}/${ride.maxPassengers}"
     }
@@ -149,6 +169,8 @@ class RideDetailsFragment : Fragment() {
                 binding.requestProgressBar.visibility = View.GONE
                 Toast.makeText(requireContext(), "Failed to load driver details", Toast.LENGTH_SHORT).show()
             }
+
+        passengersAdapter.submitList(ride.passengers)
     }
 
     private fun setupRequestButton() {

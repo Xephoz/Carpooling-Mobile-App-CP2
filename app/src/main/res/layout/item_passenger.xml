@@ -8,7 +8,7 @@
     android:background="@color/surface_1">
 
     <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/driverImage"
+        android:id="@+id/passengerImage"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:background="@color/primary_0"
@@ -19,13 +19,13 @@
         app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
-        android:id="@+id/driverName"
+        android:id="@+id/passengerName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:text="John Smith"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        app:layout_constraintStart_toEndOf="@id/driverImage"
-        app:layout_constraintTop_toTopOf="@id/driverImage"
-        app:layout_constraintBottom_toBottomOf="@id/driverImage"/>
+        app:layout_constraintStart_toEndOf="@id/passengerImage"
+        app:layout_constraintTop_toTopOf="@id/passengerImage"
+        app:layout_constraintBottom_toBottomOf="@id/passengerImage"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
