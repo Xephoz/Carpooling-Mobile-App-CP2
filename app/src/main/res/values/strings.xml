@@ -7,5 +7,8 @@
     <string name="title_activity_maps">MapsActivity</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment"><font color="white">Hello blank fragment</font></string>
+    <string name="driver_name">John Wick</string>
+    <string name="car_model">Perodua Axia - Black</string>
+    <string name="car_number">BQF6700</string>
 
 </resources>

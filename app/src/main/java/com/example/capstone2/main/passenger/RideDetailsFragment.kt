@@ -9,7 +9,6 @@ import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.capstone2.R
 import com.example.capstone2.adapter.PassengersAdapter
 import com.example.capstone2.databinding.PassengerRideDetailsBinding
 import com.example.capstone2.model.Gender
@@ -140,9 +139,11 @@ class RideDetailsFragment : Fragment() {
                 db.collection("vehicles").document(ride.vehicleId).get()
                     .addOnSuccessListener { vehicleSnapshot ->
                         if (!vehicleSnapshot.exists()) {
-                            binding.carNumber.text = "Vehicle Number"
-                            binding.carModel.text = "Vehicle Model"
+                            binding.carNumber.text = "Unknown Vehicle Number"
+                            binding.carModel.text = "Unknown Vehicle Model"
                             binding.requestProgressBar.visibility = View.GONE
+                            binding.requestButton.isEnabled = true
+                            binding.requestButton.text = "Invalid Ride"
                             Toast.makeText(requireContext(), "Vehicle not found", Toast.LENGTH_SHORT).show()
                             return@addOnSuccessListener
                         }
@@ -158,23 +159,49 @@ class RideDetailsFragment : Fragment() {
                         binding.requestButton.isEnabled = true
                     }
                     .addOnFailureListener { e ->
-                        binding.carNumber.text = "Vehicle Number"
+                        binding.carNumber.text = "Unknown Vehicle Number"
                         binding.carModel.visibility = View.GONE
                         binding.requestProgressBar.visibility = View.GONE
+                        binding.requestButton.isEnabled = true
+                        binding.requestButton.text = "Invalid Ride"
                         Toast.makeText(requireContext(), "Failed to load vehicle details", Toast.LENGTH_SHORT).show()
                     }
             }
             .addOnFailureListener { e ->
-                binding.driverName.text = "Driver Name"
+                binding.driverName.text = "Unknown Driver"
                 binding.requestProgressBar.visibility = View.GONE
+                binding.requestButton.isEnabled = true
+                binding.requestButton.text = "Invalid Ride"
                 Toast.makeText(requireContext(), "Failed to load driver details", Toast.LENGTH_SHORT).show()
             }
+
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            db.collection("rideRequests")
+                .whereEqualTo("rideId", rideId)
+                .whereEqualTo("passengerId", currentUser.uid)
+                .whereEqualTo("status", RequestStatus.PENDING)
+                .get()
+                .addOnSuccessListener { documents ->
+                    if (!documents.isEmpty) {
+                        binding.requestButton.apply {
+                            text = "Request Pending"
+                            isEnabled = false
+                        }
+                    }
+                }
+        }
 
         passengersAdapter.submitList(ride.passengers)
     }
 
     private fun setupRequestButton() {
         binding.requestButton.setOnClickListener {
+            if (binding.requestButton.text == "Invalid Ride") {
+                Toast.makeText(requireContext(), "This ride cannot be joined", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             val currentUser = auth.currentUser ?: run {
                 Toast.makeText(requireContext(), "You need to be logged in", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -201,19 +228,43 @@ class RideDetailsFragment : Fragment() {
                             Toast.makeText(requireContext(), "This ride is for females only", Toast.LENGTH_SHORT).show()
                             return@addOnSuccessListener
                         }
-                        createRideRequest()
+                        checkExistingRequest()
                     }
                     .addOnFailureListener {
                         Toast.makeText(requireContext(), "Failed to verify gender", Toast.LENGTH_SHORT).show()
                     }
             } else {
-                createRideRequest()
+                checkExistingRequest()
             }
         }
     }
 
-    private fun createRideRequest() {
+    private fun checkExistingRequest() {
         val currentUser = auth.currentUser ?: return
+
+        db.collection("rideRequests")
+            .whereEqualTo("rideId", rideId)
+            .whereEqualTo("passengerId", currentUser.uid)
+            .whereEqualTo("status", RequestStatus.PENDING)
+            .get()
+            .addOnSuccessListener { documents ->
+                if (documents.isEmpty) {
+                    createRideRequest()
+                } else {
+                    binding.requestButton.text = "Request Pending"
+                    Toast.makeText(requireContext(), "You already have a pending request for this ride", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(requireContext(), "Failed to check existing requests", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun createRideRequest() {
+        val currentUser = auth.currentUser ?: run {
+            Toast.makeText(requireContext(), "Authentication required", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         binding.requestProgressBar.visibility = View.VISIBLE
         binding.requestButton.isEnabled = false
