@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_marginVertical="4dp"
+    android:backgroundTint="@color/surface_1"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="@color/surface_1" >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingVertical="10dp"
+        android:paddingHorizontal="20dp">
+
+        <TextView
+            android:id="@+id/startLocationText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Pearl Residence Mahkota Cheras - 1, Jln Mutiara 3/2" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/EndLocationRow"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/startLocationText">
+
+            <ImageView
+                android:id="@+id/arrowText"
+                android:layout_width="wrap_content"
+                android:layout_height="26dp"
+                android:paddingEnd="4dp"
+                android:src="@drawable/baseline_arrow_right_alt_24"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <TextView
+                android:id="@+id/endLocationText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/white"
+                app:layout_constraintStart_toEndOf="@id/arrowText"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/arrowText"
+                tools:text="Sunway University" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/EndLocationRow">
+
+            <TextView
+                android:id="@+id/departureTimeText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Departure Time: Jul 09, 2025 03:45 PM"
+                android:textColor="@color/primary_5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <ImageView
+                android:id="@+id/statusIcon"
+                android:layout_width="0dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="8dp"
+                android:paddingEnd="5dp"
+                android:src="@drawable/baseline_circle_24"
+                app:tint="@color/pending_request"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/departureTimeText" />
+
+            <TextView
+                android:id="@+id/statusText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Request Pending"
+                android:textColor="@color/primary_5"
+                app:layout_constraintStart_toEndOf="@id/statusIcon"
+                app:layout_constraintTop_toTopOf="@id/statusIcon"
+                app:layout_constraintBottom_toBottomOf="@id/statusIcon"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

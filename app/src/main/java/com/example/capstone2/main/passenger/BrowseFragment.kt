@@ -101,7 +101,7 @@ class BrowseFragment : Fragment() {
         }
     }
 
-    // TODO: Add pagination
+    // TODO: Add pagination if too many rides
     private fun setupRecyclerView() {
         binding.ridesRecyclerView.apply {
             adapter = ridesAdapter

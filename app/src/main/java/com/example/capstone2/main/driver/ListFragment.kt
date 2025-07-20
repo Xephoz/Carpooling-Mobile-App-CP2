@@ -40,7 +40,7 @@ class ListFragment : Fragment() {
         view.clearFocus()
         setupRecyclerView()
         setupSwipeRefresh()
-        setupcreateRideButton()
+        setupCreateRideButton()
         loadUserRides(showLoading = true, isInitialLoad = true)
     }
 
@@ -60,7 +60,7 @@ class ListFragment : Fragment() {
         }
     }
 
-    private fun setupcreateRideButton() {
+    private fun setupCreateRideButton() {
         binding.createRideButton.setOnClickListener {
             findNavController().navigate(R.id.action_listFragment_to_createFragment)
         }
