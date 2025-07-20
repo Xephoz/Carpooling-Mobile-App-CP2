@@ -123,7 +123,7 @@ class RideDetailsFragment : Fragment() {
             .replace(" AM", " AM")
             .replace(" PM", " PM")
 
-        binding.passengerText.text = "${ride.passengers.size}/${ride.maxPassengers}"
+        binding.passengerText.text = "[${ride.passengers.size}/${ride.maxPassengers}]"
     }
 
     private fun fetchDriverAndVehicleDetails() {
@@ -184,6 +184,8 @@ class RideDetailsFragment : Fragment() {
                 .get()
                 .addOnSuccessListener { documents ->
                     if (!documents.isEmpty) {
+                        binding.statusIcon.visibility = View.VISIBLE
+                        binding.statusText.visibility = View.VISIBLE
                         binding.requestButton.apply {
                             text = "Request Pending"
                             isEnabled = false
@@ -251,6 +253,8 @@ class RideDetailsFragment : Fragment() {
                 if (documents.isEmpty) {
                     createRideRequest()
                 } else {
+                    binding.statusIcon.visibility = View.VISIBLE
+                    binding.statusText.visibility = View.VISIBLE
                     binding.requestButton.text = "Request Pending"
                     Toast.makeText(requireContext(), "You already have a pending request for this ride", Toast.LENGTH_SHORT).show()
                 }

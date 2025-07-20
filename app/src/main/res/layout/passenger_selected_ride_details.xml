@@ -184,8 +184,7 @@
                         app:tint="@color/pending_request"
                         app:layout_constraintEnd_toEndOf="@id/startIcon"
                         app:layout_constraintStart_toStartOf="@id/startIcon"
-                        app:layout_constraintTop_toBottomOf="@id/dateIcon"
-                        android:visibility="gone"/>
+                        app:layout_constraintTop_toBottomOf="@id/dateIcon" />
 
                     <TextView
                         android:id="@+id/statusText"
@@ -198,8 +197,7 @@
                         app:layout_constraintBottom_toBottomOf="@id/statusIcon"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/dateIcon"
-                        app:layout_constraintTop_toTopOf="@id/statusIcon"
-                        android:visibility="gone"/>
+                        app:layout_constraintTop_toTopOf="@id/statusIcon" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 

@@ -10,11 +10,15 @@
     <color name="white">#FFFFFFFF</color>
     <color name="red">#E53935</color>
     <color name="light_red">#F44336</color>
+    <color name="pending_request">#FBC02D</color>
+
+<!--    TODO: Remove unused colors     -->
     <color name="gray_icon">#484e54</color>
     <color name="gray_font">#928f94</color>
     <color name="gray_font_2">#B4B1B6</color>
     <color name="gray_font_3">#DEDAE0</color>
     <color name="primary">#141C27</color>
+
 
 <!--    https://colorffy.com/dark-theme-generator?colors=1D242B-141B26    -->
     <color name="primary_0">#1d242b</color>
