@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.capstone2.R
 import com.example.capstone2.auth.AuthActivity
 import com.google.android.material.textview.MaterialTextView
@@ -32,6 +33,18 @@ class SettingsFragment : Fragment() {
 
         view.findViewById<MaterialTextView>(R.id.logoutButton).setOnClickListener {
             showLogoutDialog()
+        }
+
+        view.findViewById<View>(R.id.profileContainer).setOnClickListener {
+            findNavController().navigate(R.id.action_settingsFragment_to_profileFragment)
+        }
+
+        view.findViewById<View>(R.id.addVehicleContainer).setOnClickListener {
+            findNavController().navigate(R.id.action_settingsFragment_to_addVehicleFragment)
+        }
+
+        // TODO: Navigate to view vehicles
+        view.findViewById<View>(R.id.myVehiclesContainer).setOnClickListener {
         }
     }
 

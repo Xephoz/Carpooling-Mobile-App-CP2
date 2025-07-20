@@ -6,5 +6,6 @@ data class Vehicle(
     val carModel: String = "",
     val carBrand: String = "",
     val color: String = "",
-    val conditionRating: Float? = null     // Rating of vehicle condition, to be calculated when enough reviews are available.
+    // TODO: Rating of vehicle condition
+     val conditionRating: Float? = null
 )

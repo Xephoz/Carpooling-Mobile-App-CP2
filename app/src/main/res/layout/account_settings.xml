@@ -42,7 +42,9 @@
                 android:id="@+id/profileContainer"
                 android:paddingVertical="10dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true">
 
                 <ImageView
                     android:id="@+id/profileIcon"
@@ -97,7 +99,9 @@
                 android:id="@+id/addVehicleContainer"
                 android:paddingVertical="10dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true">
 
                 <ImageView
                     android:id="@+id/addIcon"
@@ -152,7 +156,9 @@
                 android:id="@+id/myVehiclesContainer"
                 android:paddingVertical="10dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true">
 
                 <ImageView
                     android:id="@+id/myVehiclesIcon"

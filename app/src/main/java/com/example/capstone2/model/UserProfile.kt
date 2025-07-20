@@ -12,9 +12,10 @@ data class UserProfile(
     val lastName: String = "",
     val email: String = "",
     val phoneNumber: String? = null,
-    val profileImageUrl: String? = null,
-    val driverRating: Float? = null,        // Rating as a driver.
-    val passengerRating: Float? = null,     // Rating as a passenger
     val gender: Gender? = null,
-    val university: String = ""
+    val university: String = "",
+    // TODO: Implement following fields
+     val profileImageUrl: String? = null,
+     val driverRating: Float? = null,        // Rating as a driver.
+     val passengerRating: Float? = null,     // Rating as a passenger
 )
