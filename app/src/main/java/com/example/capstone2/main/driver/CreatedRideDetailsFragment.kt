@@ -1,6 +1,7 @@
 package com.example.capstone2.main.driver
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,14 +11,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.capstone2.adapter.PassengersAdapter
+import com.example.capstone2.adapter.RequestsAdapter
 import com.example.capstone2.databinding.DriverRideDetailsBinding
-import com.example.capstone2.model.Gender
-import com.example.capstone2.model.RequestStatus
 import com.example.capstone2.model.Ride
 import com.example.capstone2.model.RideRequest
 import com.example.capstone2.model.UserProfile
 import com.example.capstone2.model.Vehicle
-import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -25,10 +24,11 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
 
-class RideDetailsFragment : Fragment() {
+class CreatedRideDetailsFragment : Fragment() {
     private var _binding: DriverRideDetailsBinding? = null
     private val binding get() = _binding!!
     private lateinit var passengersAdapter: PassengersAdapter
+    private lateinit var requestsAdapter: RequestsAdapter
     private val db = Firebase.firestore
     private val auth = FirebaseAuth.getInstance()
 
@@ -58,6 +58,7 @@ class RideDetailsFragment : Fragment() {
 
         setupToolbar()
         loadRideDetails()
+        setupRequestsRecyclerView()
         setupPassengersRecyclerView()
     }
 
@@ -88,11 +89,21 @@ class RideDetailsFragment : Fragment() {
 
                 // Fetch driver and vehicle details
                 fetchDriverAndVehicleDetails()
+                loadRequests()
             }
             .addOnFailureListener { e ->
                 Toast.makeText(requireContext(), "Failed to load ride: ${e.message}", Toast.LENGTH_SHORT).show()
                 findNavController().navigateUp()
             }
+    }
+
+    private fun setupRequestsRecyclerView() {
+        binding.requestsRecyclerView.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            requestsAdapter = RequestsAdapter()
+            adapter = requestsAdapter
+            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+        }
     }
 
     private fun setupPassengersRecyclerView() {
@@ -157,6 +168,25 @@ class RideDetailsFragment : Fragment() {
                 Toast.makeText(requireContext(), "Failed to load driver details", Toast.LENGTH_SHORT).show()
             }
         passengersAdapter.submitList(ride.passengers)
+    }
+
+    private fun loadRequests() {
+        db.collection("rideRequests")
+            .whereEqualTo("rideId", rideId)
+            .whereEqualTo("status", "PENDING")
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                val requests = querySnapshot.toObjects(RideRequest::class.java)
+                Log.d("Requests", "Loaded ${requests.size} requests")
+                requestsAdapter.submitList(requests)
+
+                // Show/hide section based on requests
+                binding.requestsContainer.visibility = if (requests.isEmpty()) View.GONE else View.VISIBLE
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(requireContext(), "Failed to load requests: ${e.message}", Toast.LENGTH_SHORT).show()
+                Log.e("Requests", "Error loading requests", e)
+            }
     }
 
     override fun onDestroyView() {
