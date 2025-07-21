@@ -13,7 +13,19 @@
 
         <action
             android:id="@+id/action_listFragment_to_createFragment"
-            app:destination="@id/createFragment" />
+            app:destination="@id/createFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/listFragment"
+            app:popUpToSaveState="true"
+            app:restoreState="true" /> />
+
+        <action
+            android:id="@+id/action_listFragment_to_createRideDetailsFragment"
+            app:destination="@id/createRideDetailsFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/listFragment"
+            app:popUpToSaveState="true"
+            app:restoreState="true" />
     </fragment>
 
     <fragment
@@ -21,11 +33,16 @@
         android:name="com.example.capstone2.main.driver.CreateFragment"
         tools:layout="@layout/driver_create"
         android:label="Create Ride">
+    </fragment>
 
-        <action
-            android:id="@+id/action_createFragment_to_listFragment"
-            app:destination="@id/listFragment"
-            app:popUpTo="@id/listFragment"
-            app:popUpToInclusive="true" />
+    <fragment
+        android:id="@+id/createRideDetailsFragment"
+        android:name="com.example.capstone2.main.driver.CreatedRideDetailsFragment"
+        android:label="Ride Details"
+        tools:layout="@layout/driver_ride_details">
+        <argument
+            android:name="rideId"
+            android:defaultValue=""
+            app:argType="string" />
     </fragment>
 </navigation>

@@ -5,8 +5,7 @@ import com.google.firebase.Timestamp
 enum class RequestStatus {
     PENDING,
     CONFIRMED,
-    REJECTED,
-    CANCELLED
+    REJECTED
 }
 
 data class RideRequest(

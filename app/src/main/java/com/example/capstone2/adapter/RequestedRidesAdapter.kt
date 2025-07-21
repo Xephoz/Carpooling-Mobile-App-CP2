@@ -59,7 +59,6 @@ class RequestedRidesAdapter(
                 RequestStatus.PENDING -> "Request Pending"
                 RequestStatus.CONFIRMED -> "Request Confirmed"
                 RequestStatus.REJECTED -> "Request Rejected"
-                RequestStatus.CANCELLED -> "Request Cancelled"
             }
 
             // Set status icon color
@@ -67,7 +66,7 @@ class RequestedRidesAdapter(
                 ContextCompat.getColor(itemView.context, when (request.status) {
                     RequestStatus.CONFIRMED -> R.color.confirmed_request
                     RequestStatus.PENDING -> R.color.pending_request
-                    RequestStatus.REJECTED, RequestStatus.CANCELLED -> R.color.rejected_request
+                    RequestStatus.REJECTED -> R.color.rejected_request
                 }))
         }
     }

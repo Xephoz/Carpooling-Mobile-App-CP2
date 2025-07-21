@@ -288,6 +288,46 @@
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/requestsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:baselineAligned="false"
+                android:backgroundTint="@color/surface_1"
+                app:cardBackgroundColor="@color/surface_1">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="15dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="15dp">
+
+                    <TextView
+                        android:id="@+id/requestsText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="20dp"
+                        android:text="Carpool Requests"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/requestsRecyclerView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clipToPadding="false"
+                        app:layout_constraintTop_toBottomOf="@id/requestsText"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        tools:itemCount="1"
+                        tools:listitem="@layout/item_passenger"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="10dp"
@@ -303,7 +343,7 @@
                     android:paddingRight="15dp">
 
                     <TextView
-                        android:id="@+id/currentPassengers"
+                        android:id="@+id/passengerText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingBottom="20dp"
@@ -314,7 +354,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
-                        android:id="@+id/passengerText"
+                        android:id="@+id/passengerCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingBottom="20dp"
@@ -322,7 +362,7 @@
                         android:text="[1/3]"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                         android:textStyle="bold"
-                        app:layout_constraintStart_toEndOf="@id/currentPassengers"
+                        app:layout_constraintStart_toEndOf="@id/passengerText"
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <androidx.recyclerview.widget.RecyclerView
@@ -330,7 +370,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:clipToPadding="false"
-                        app:layout_constraintTop_toBottomOf="@id/currentPassengers"
+                        app:layout_constraintTop_toBottomOf="@id/passengerText"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         tools:itemCount="1"

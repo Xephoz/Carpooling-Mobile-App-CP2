@@ -1,6 +1,7 @@
 package com.example.capstone2.main.driver
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,25 +11,27 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.capstone2.adapter.PassengersAdapter
+import com.example.capstone2.adapter.RequestsAdapter
 import com.example.capstone2.databinding.DriverRideDetailsBinding
-import com.example.capstone2.model.Gender
 import com.example.capstone2.model.RequestStatus
 import com.example.capstone2.model.Ride
 import com.example.capstone2.model.RideRequest
 import com.example.capstone2.model.UserProfile
 import com.example.capstone2.model.Vehicle
-import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.WriteBatch
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
 
-class RideDetailsFragment : Fragment() {
+class CreatedRideDetailsFragment : Fragment() {
     private var _binding: DriverRideDetailsBinding? = null
     private val binding get() = _binding!!
     private lateinit var passengersAdapter: PassengersAdapter
+    private lateinit var requestsAdapter: RequestsAdapter
     private val db = Firebase.firestore
     private val auth = FirebaseAuth.getInstance()
 
@@ -58,6 +61,7 @@ class RideDetailsFragment : Fragment() {
 
         setupToolbar()
         loadRideDetails()
+        setupRequestsRecyclerView()
         setupPassengersRecyclerView()
     }
 
@@ -88,11 +92,25 @@ class RideDetailsFragment : Fragment() {
 
                 // Fetch driver and vehicle details
                 fetchDriverAndVehicleDetails()
+                loadRequests()
             }
             .addOnFailureListener { e ->
                 Toast.makeText(requireContext(), "Failed to load ride: ${e.message}", Toast.LENGTH_SHORT).show()
                 findNavController().navigateUp()
             }
+    }
+
+    private fun setupRequestsRecyclerView() {
+        binding.requestsRecyclerView.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            requestsAdapter = RequestsAdapter().apply {
+                onRequestAction = { rideRequest, newStatus ->
+                    handleRequestAction(rideRequest, newStatus)
+                }
+            }
+            adapter = requestsAdapter
+            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+        }
     }
 
     private fun setupPassengersRecyclerView() {
@@ -118,7 +136,7 @@ class RideDetailsFragment : Fragment() {
             .replace(" AM", " AM")
             .replace(" PM", " PM")
 
-        binding.passengerText.text = "[${ride.passengers.size}/${ride.maxPassengers}]"
+        binding.passengerCount.text = "[${ride.passengers.size}/${ride.maxPassengers}]"
     }
 
     private fun fetchDriverAndVehicleDetails() {
@@ -157,6 +175,78 @@ class RideDetailsFragment : Fragment() {
                 Toast.makeText(requireContext(), "Failed to load driver details", Toast.LENGTH_SHORT).show()
             }
         passengersAdapter.submitList(ride.passengers)
+    }
+
+    private fun loadRequests() {
+        db.collection("rideRequests")
+            .whereEqualTo("rideId", rideId)
+            .whereEqualTo("status", RequestStatus.PENDING)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                val requests = querySnapshot.toObjects(RideRequest::class.java)
+                Log.d("Requests", "Loaded ${requests.size} requests")
+                requestsAdapter.submitList(requests)
+
+                // Show/hide section based on requests
+                binding.requestsContainer.visibility = if (requests.isEmpty()) View.GONE else View.VISIBLE
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(requireContext(), "Failed to load requests: ${e.message}", Toast.LENGTH_SHORT).show()
+                Log.e("Requests", "Error loading requests", e)
+            }
+    }
+
+    private fun handleRequestAction(rideRequest: RideRequest, newStatus: RequestStatus) {
+        val batch = db.batch()
+
+        // 1. Update the request status
+        val requestRef = db.collection("rideRequests").document(rideRequest.requestId)
+        batch.update(requestRef, "status", newStatus.name)
+
+        if (newStatus == RequestStatus.CONFIRMED) {
+            // 2. Add passenger to ride if accepted
+            val rideRef = db.collection("rides").document(rideId)
+            batch.update(rideRef, "passengers", FieldValue.arrayUnion(rideRequest.passengerId))
+
+            // 3. Reject all other pending requests from this user for the same ride
+            db.collection("rideRequests")
+                .whereEqualTo("rideId", rideId)
+                .whereEqualTo("passengerId", rideRequest.passengerId)
+                .whereEqualTo("status", RequestStatus.PENDING.name)
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    querySnapshot.documents.forEach { doc ->
+                        batch.update(doc.reference, "status", RequestStatus.REJECTED.name)
+                    }
+                    commitBatch(batch)
+                }
+        } else {
+            commitBatch(batch)
+        }
+    }
+
+    private fun commitBatch(batch: WriteBatch) {
+        batch.commit()
+            .addOnSuccessListener {
+                Toast.makeText(
+                    requireContext(),
+                    "Request updated successfully",
+                    Toast.LENGTH_SHORT
+                ).show()
+                refreshData()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(
+                    requireContext(),
+                    "Failed to update request: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+    }
+
+    private fun refreshData() {
+        // Reload both ride details and requests
+        loadRideDetails()
     }
 
     override fun onDestroyView() {
