@@ -2,6 +2,7 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/mainContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
@@ -175,31 +176,32 @@
                         app:layout_constraintStart_toEndOf="@id/dateIcon"
                         app:layout_constraintTop_toTopOf="@id/dateIcon" />
 
-                    <ImageView
-                        android:id="@+id/statusIcon"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="15dp"
-                        android:src="@drawable/baseline_circle_24"
-                        app:tint="@color/pending_request"
-                        app:layout_constraintEnd_toEndOf="@id/startIcon"
-                        app:layout_constraintStart_toStartOf="@id/startIcon"
-                        app:layout_constraintTop_toBottomOf="@id/dateIcon"
-                        android:visibility="gone"/>
+<!--                    TODO: Ride status -->
+<!--                    <ImageView-->
+<!--                        android:id="@+id/statusIcon"-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginTop="15dp"-->
+<!--                        android:src="@drawable/baseline_circle_24"-->
+<!--                        app:tint="@color/pending_request"-->
+<!--                        app:layout_constraintEnd_toEndOf="@id/startIcon"-->
+<!--                        app:layout_constraintStart_toStartOf="@id/startIcon"-->
+<!--                        app:layout_constraintTop_toBottomOf="@id/dateIcon"-->
+<!--                        android:visibility="gone"/>-->
 
-                    <TextView
-                        android:id="@+id/statusText"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="Ride is in progress"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-                        android:textColor="@color/primary_5"
-                        app:layout_constraintBottom_toBottomOf="@id/statusIcon"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/dateIcon"
-                        app:layout_constraintTop_toTopOf="@id/statusIcon"
-                        android:visibility="gone"/>
+<!--                    <TextView-->
+<!--                        android:id="@+id/statusText"-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginStart="10dp"-->
+<!--                        android:text="Ride is in progress"-->
+<!--                        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"-->
+<!--                        android:textColor="@color/primary_5"-->
+<!--                        app:layout_constraintBottom_toBottomOf="@id/statusIcon"-->
+<!--                        app:layout_constraintEnd_toEndOf="parent"-->
+<!--                        app:layout_constraintStart_toEndOf="@id/dateIcon"-->
+<!--                        app:layout_constraintTop_toTopOf="@id/statusIcon"-->
+<!--                        android:visibility="gone"/>-->
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -307,7 +309,7 @@
                         android:id="@+id/requestsText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingBottom="20dp"
+                        android:paddingBottom="10dp"
                         android:text="Carpool Requests"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                         android:textStyle="bold"
@@ -346,7 +348,7 @@
                         android:id="@+id/passengerText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingBottom="20dp"
+                        android:paddingBottom="10dp"
                         android:text="Current Passengers"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                         android:textStyle="bold"
@@ -359,7 +361,7 @@
                         android:layout_height="wrap_content"
                         android:paddingBottom="20dp"
                         android:layout_marginStart="10dp"
-                        android:text="[1/3]"
+                        android:text="[0/0]"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                         android:textStyle="bold"
                         app:layout_constraintStart_toEndOf="@id/passengerText"
@@ -373,12 +375,21 @@
                         app:layout_constraintTop_toBottomOf="@id/passengerText"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        tools:itemCount="1"
-                        tools:listitem="@layout/item_passenger"/>
+                        tools:itemCount="2"
+                        tools:listitem="@layout/item_passenger"
+                        android:visibility="gone"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/passengerEmpty"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="20dp"
+                        android:text="You have not accepted any passengers yet"
+                        android:textColor="@color/primary_5"
+                        app:layout_constraintTop_toBottomOf="@id/passengerText"/>
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

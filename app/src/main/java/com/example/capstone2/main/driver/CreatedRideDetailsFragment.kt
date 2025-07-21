@@ -5,11 +5,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.capstone2.R
 import com.example.capstone2.adapter.PassengersAdapter
 import com.example.capstone2.adapter.RequestsAdapter
 import com.example.capstone2.databinding.DriverRideDetailsBinding
@@ -18,7 +21,7 @@ import com.example.capstone2.model.Ride
 import com.example.capstone2.model.RideRequest
 import com.example.capstone2.model.UserProfile
 import com.example.capstone2.model.Vehicle
-import com.google.firebase.auth.FirebaseAuth
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.WriteBatch
 import com.google.firebase.firestore.ktx.firestore
@@ -33,7 +36,6 @@ class CreatedRideDetailsFragment : Fragment() {
     private lateinit var passengersAdapter: PassengersAdapter
     private lateinit var requestsAdapter: RequestsAdapter
     private val db = Firebase.firestore
-    private val auth = FirebaseAuth.getInstance()
 
     private lateinit var rideId: String
     private lateinit var ride: Ride
@@ -104,8 +106,10 @@ class CreatedRideDetailsFragment : Fragment() {
         binding.requestsRecyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
             requestsAdapter = RequestsAdapter().apply {
-                onRequestAction = { rideRequest, newStatus ->
-                    handleRequestAction(rideRequest, newStatus)
+                onRequestAction = { rideRequest, newStatus, onComplete ->
+                    // Disable all buttons immediately
+                    disableAllButtons()
+                    handleRequestAction(rideRequest, newStatus, onComplete)
                 }
             }
             adapter = requestsAdapter
@@ -127,16 +131,23 @@ class CreatedRideDetailsFragment : Fragment() {
         binding.endLocation.text = ride.endLocation.displayName
 
         val date = ride.departureTime.toDate()
-
         val dateFormat = SimpleDateFormat("MMMM d, yyyy 'at' h:mm a", Locale.getDefault()).apply {
             timeZone = TimeZone.getDefault()
         }
-
         binding.dateText.text = dateFormat.format(date)
             .replace(" AM", " AM")
             .replace(" PM", " PM")
 
         binding.passengerCount.text = "[${ride.passengers.size}/${ride.maxPassengers}]"
+
+        // Show/hide passengers section based on whether there are passengers
+        if (ride.passengers.isNotEmpty()) {
+            binding.passengersRecyclerView.visibility = View.VISIBLE
+            binding.passengerEmpty.visibility = View.GONE
+        } else {
+            binding.passengersRecyclerView.visibility = View.GONE
+            binding.passengerEmpty.visibility = View.VISIBLE
+        }
     }
 
     private fun fetchDriverAndVehicleDetails() {
@@ -175,6 +186,14 @@ class CreatedRideDetailsFragment : Fragment() {
                 Toast.makeText(requireContext(), "Failed to load driver details", Toast.LENGTH_SHORT).show()
             }
         passengersAdapter.submitList(ride.passengers)
+
+        if (ride.passengers.isNotEmpty()) {
+            binding.passengersRecyclerView.visibility = View.VISIBLE
+            binding.passengerEmpty.visibility = View.GONE
+        } else {
+            binding.passengersRecyclerView.visibility = View.GONE
+            binding.passengerEmpty.visibility = View.VISIBLE
+        }
     }
 
     private fun loadRequests() {
@@ -196,44 +215,70 @@ class CreatedRideDetailsFragment : Fragment() {
             }
     }
 
-    private fun handleRequestAction(rideRequest: RideRequest, newStatus: RequestStatus) {
+    private fun handleRequestAction(
+        rideRequest: RideRequest,
+        newStatus: RequestStatus,
+        onComplete: () -> Unit
+    ) {
         val batch = db.batch()
-
-        // 1. Update the request status
         val requestRef = db.collection("rideRequests").document(rideRequest.requestId)
         batch.update(requestRef, "status", newStatus.name)
 
         if (newStatus == RequestStatus.CONFIRMED) {
-            // 2. Add passenger to ride if accepted
             val rideRef = db.collection("rides").document(rideId)
             batch.update(rideRef, "passengers", FieldValue.arrayUnion(rideRequest.passengerId))
 
-            // 3. Reject all other pending requests from this user for the same ride
-            db.collection("rideRequests")
-                .whereEqualTo("rideId", rideId)
-                .whereEqualTo("passengerId", rideRequest.passengerId)
-                .whereEqualTo("status", RequestStatus.PENDING.name)
-                .get()
-                .addOnSuccessListener { querySnapshot ->
-                    querySnapshot.documents.forEach { doc ->
-                        batch.update(doc.reference, "status", RequestStatus.REJECTED.name)
+            val updatedPassengerCount = ride.passengers.size + 1
+            if (updatedPassengerCount >= ride.maxPassengers) {
+                db.collection("rideRequests")
+                    .whereEqualTo("rideId", rideId)
+                    .whereEqualTo("status", RequestStatus.PENDING.name)
+                    .whereNotEqualTo("__name__", rideRequest.requestId)
+                    .get()
+                    .addOnSuccessListener { querySnapshot ->
+                        querySnapshot.documents.forEach { doc ->
+                            batch.update(doc.reference, "status", RequestStatus.REJECTED.name)
+                        }
+                        commitBatch(batch, onComplete)
                     }
-                    commitBatch(batch)
-                }
+                    .addOnFailureListener { e ->
+                        commitBatch(batch, onComplete)
+                    }
+            } else {
+                db.collection("rideRequests")
+                    .whereEqualTo("rideId", rideId)
+                    .whereEqualTo("passengerId", rideRequest.passengerId)
+                    .whereEqualTo("status", RequestStatus.PENDING.name)
+                    .whereNotEqualTo("__name__", rideRequest.requestId)
+                    .get()
+                    .addOnSuccessListener { querySnapshot ->
+                        querySnapshot.documents.forEach { doc ->
+                            batch.update(doc.reference, "status", RequestStatus.REJECTED.name)
+                        }
+                        commitBatch(batch, onComplete)
+                    }
+            }
         } else {
-            commitBatch(batch)
+            commitBatch(batch, onComplete)
         }
     }
 
-    private fun commitBatch(batch: WriteBatch) {
+    private fun commitBatch(batch: WriteBatch, onComplete: () -> Unit) {
         batch.commit()
             .addOnSuccessListener {
-                Toast.makeText(
-                    requireContext(),
-                    "Request updated successfully",
-                    Toast.LENGTH_SHORT
-                ).show()
+                val updatedPassengerCount = ride.passengers.size + 1
+                val isLastPassenger = updatedPassengerCount >= ride.maxPassengers
+
+                // Combine messages if it's the last passenger
+                val message = if (isLastPassenger) {
+                    "Request accepted successfully.\nRemaining requests have been rejected automatically."
+                } else {
+                    "Request accepted successfully."
+                }
+
+                showSuccessSnackbar(message)
                 refreshData()
+                onComplete()
             }
             .addOnFailureListener { e ->
                 Toast.makeText(
@@ -241,11 +286,38 @@ class CreatedRideDetailsFragment : Fragment() {
                     "Failed to update request: ${e.message}",
                     Toast.LENGTH_SHORT
                 ).show()
+                onComplete()
             }
     }
 
+    private fun showSuccessSnackbar(message: String) {
+        // Set duration to 5 seconds (5000ms)
+        val durationMs = 5000
+        val snackbar = Snackbar.make(binding.root, message, Snackbar.LENGTH_INDEFINITE).apply {
+            duration = durationMs
+
+            // Add bottom margin
+            view.apply {
+                layoutParams = (layoutParams as ViewGroup.MarginLayoutParams).apply {
+                    bottomMargin = resources.getDimensionPixelSize(R.dimen.snackbar_margin_bottom)
+                }
+                setBackgroundColor(ContextCompat.getColor(context, R.color.confirmed_request))
+
+                // Enable multi-line text
+                findViewById<TextView>(com.google.android.material.R.id.snackbar_text)?.apply {
+                    maxLines = 3 // Allow up to 3 lines of text
+                }
+            }
+
+            // Set action with close icon
+            setAction(android.R.string.ok) { dismiss() }
+            view.findViewById<TextView>(com.google.android.material.R.id.snackbar_action)
+        }
+
+        snackbar.show()
+    }
+
     private fun refreshData() {
-        // Reload both ride details and requests
         loadRideDetails()
     }
 

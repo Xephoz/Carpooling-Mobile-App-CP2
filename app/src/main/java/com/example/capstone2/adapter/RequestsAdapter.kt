@@ -17,22 +17,44 @@ import com.example.capstone2.model.RideRequest
 
 class RequestsAdapter : ListAdapter<RideRequest, RequestsAdapter.RequestsViewHolder>(DiffCallback()) {
 
-    var onRequestAction: ((RideRequest, RequestStatus) -> Unit)? = null
+    var onRequestAction: ((RideRequest, RequestStatus, () -> Unit) -> Unit)? = null
+    private val viewHolders = mutableListOf<RequestsViewHolder>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RequestsViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_passenger, parent, false)
-        return RequestsViewHolder(view)
+        return RequestsViewHolder(view).also {
+            viewHolders.add(it)
+        }
     }
 
     override fun onBindViewHolder(holder: RequestsViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
+    override fun onViewRecycled(holder: RequestsViewHolder) {
+        super.onViewRecycled(holder)
+        viewHolders.remove(holder)
+    }
+
+    fun disableAllButtons() {
+        viewHolders.forEach { holder ->
+            holder.acceptButton.isEnabled = false
+            holder.rejectButton.isEnabled = false
+        }
+    }
+
+    fun enableAllButtons() {
+        viewHolders.forEach { holder ->
+            holder.acceptButton.isEnabled = true
+            holder.rejectButton.isEnabled = true
+        }
+    }
+
     inner class RequestsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val passengerName: TextView = itemView.findViewById(R.id.passengerName)
-        private val acceptButton: ImageView = itemView.findViewById(R.id.acceptButton)
-        private val rejectButton: ImageView = itemView.findViewById(R.id.rejectButton)
+        val passengerName: TextView = itemView.findViewById(R.id.passengerName)
+        val acceptButton: ImageView = itemView.findViewById(R.id.acceptButton)
+        val rejectButton: ImageView = itemView.findViewById(R.id.rejectButton)
 
         fun bind(rideRequest: RideRequest) {
             acceptButton.visibility = View.VISIBLE
@@ -46,11 +68,17 @@ class RequestsAdapter : ListAdapter<RideRequest, RequestsAdapter.RequestsViewHol
                 }
 
             acceptButton.setOnClickListener {
-                onRequestAction?.invoke(rideRequest, RequestStatus.CONFIRMED)
+                disableAllButtons()
+                onRequestAction?.invoke(rideRequest, RequestStatus.CONFIRMED) {
+                    enableAllButtons()
+                }
             }
 
             rejectButton.setOnClickListener {
-                onRequestAction?.invoke(rideRequest, RequestStatus.REJECTED)
+                disableAllButtons()
+                onRequestAction?.invoke(rideRequest, RequestStatus.REJECTED) {
+                    enableAllButtons()
+                }
             }
         }
     }

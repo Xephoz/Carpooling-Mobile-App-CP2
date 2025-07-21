@@ -1,19 +1,16 @@
 package com.example.capstone2.main.passenger
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.capstone2.R
 import com.example.capstone2.adapter.PassengersAdapter
 import com.example.capstone2.databinding.PassengerRideDetailsBinding
-import com.example.capstone2.model.Gender
 import com.example.capstone2.model.RequestStatus
 import com.example.capstone2.model.Ride
 import com.example.capstone2.model.RideRequest
@@ -204,23 +201,25 @@ class RideDetailsFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            // Check female-only restriction
-            if (ride.femaleOnly) {
-                db.collection("users").document(currentUser.uid).get()
-                    .addOnSuccessListener { snapshot ->
-                        val userProfile = snapshot.toObject(UserProfile::class.java)
-                        if (userProfile?.gender != Gender.FEMALE) {
-                            Toast.makeText(requireContext(), "This ride is for females only", Toast.LENGTH_SHORT).show()
-                            return@addOnSuccessListener
-                        }
-                        checkExistingRequest()
-                    }
-                    .addOnFailureListener {
-                        Toast.makeText(requireContext(), "Failed to verify gender", Toast.LENGTH_SHORT).show()
-                    }
-            } else {
-                checkExistingRequest()
-            }
+            checkExistingRequest()
+
+            // TODO: Check female-only restriction
+//            if (ride.femaleOnly) {
+//                db.collection("users").document(currentUser.uid).get()
+//                    .addOnSuccessListener { snapshot ->
+//                        val userProfile = snapshot.toObject(UserProfile::class.java)
+//                        if (userProfile?.gender != Gender.FEMALE) {
+//                            Toast.makeText(requireContext(), "This ride is for females only", Toast.LENGTH_SHORT).show()
+//                            return@addOnSuccessListener
+//                        }
+//                        checkExistingRequest()
+//                    }
+//                    .addOnFailureListener {
+//                        Toast.makeText(requireContext(), "Failed to verify gender", Toast.LENGTH_SHORT).show()
+//                    }
+//            } else {
+//                checkExistingRequest()
+//            }
         }
     }
 
