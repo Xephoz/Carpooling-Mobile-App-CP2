@@ -11,6 +11,8 @@
     <color name="red">#E53935</color>
     <color name="light_red">#F44336</color>
     <color name="pending_request">#FBC02D</color>
+    <color name="confirmed_request">#4CAF50</color>
+    <color name="rejected_request">#F44336</color>
 
 <!--    TODO: Remove unused colors     -->
     <color name="gray_icon">#484e54</color>

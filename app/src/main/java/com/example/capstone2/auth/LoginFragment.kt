@@ -39,7 +39,7 @@ class LoginFragment : Fragment() {
         firebaseAuth = FirebaseAuth.getInstance()
 
         binding.loginButton.setOnClickListener {
-            val email = binding.loginEmail.text.toString()
+            val email = binding.loginEmail.text.toString().trim().lowercase()
             val password = binding.loginPassword.text.toString()
 
             if (email.isNotEmpty() && password.isNotEmpty()) {

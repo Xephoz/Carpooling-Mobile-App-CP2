@@ -46,7 +46,7 @@ class RegisterFragment : Fragment() {
 
             val firstName = binding.firstName.text.toString().trim()
             val lastName = binding.lastName.text.toString().trim()
-            val email = binding.registerEmail.text.toString().trim()
+            val email = binding.registerEmail.text.toString().trim().lowercase()
             val password = binding.registerPassword.text.toString()
             val confirmPassword = binding.registerConfirm.text.toString()
 

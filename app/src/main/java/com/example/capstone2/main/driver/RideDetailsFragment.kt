@@ -1,18 +1,16 @@
-package com.example.capstone2.main.passenger
+package com.example.capstone2.main.driver
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.capstone2.R
 import com.example.capstone2.adapter.PassengersAdapter
-import com.example.capstone2.databinding.PassengerRideDetailsBinding
+import com.example.capstone2.databinding.DriverRideDetailsBinding
 import com.example.capstone2.model.Gender
 import com.example.capstone2.model.RequestStatus
 import com.example.capstone2.model.Ride
@@ -28,7 +26,7 @@ import java.util.Locale
 import java.util.TimeZone
 
 class RideDetailsFragment : Fragment() {
-    private var _binding: PassengerRideDetailsBinding? = null
+    private var _binding: DriverRideDetailsBinding? = null
     private val binding get() = _binding!!
     private lateinit var passengersAdapter: PassengersAdapter
     private val db = Firebase.firestore
@@ -44,7 +42,7 @@ class RideDetailsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = PassengerRideDetailsBinding.inflate(inflater, container, false)
+        _binding = DriverRideDetailsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -61,7 +59,6 @@ class RideDetailsFragment : Fragment() {
         setupToolbar()
         loadRideDetails()
         setupPassengersRecyclerView()
-        setupRequestButton()
     }
 
     private fun setupToolbar() {
@@ -71,10 +68,6 @@ class RideDetailsFragment : Fragment() {
     }
 
     private fun loadRideDetails() {
-        // Show loading state
-        binding.requestProgressBar.visibility = View.VISIBLE
-        binding.requestButton.isEnabled = false
-
         // Fetch ride details
         db.collection("rides").document(rideId).get()
             .addOnSuccessListener { rideSnapshot ->
@@ -143,9 +136,6 @@ class RideDetailsFragment : Fragment() {
                         if (!vehicleSnapshot.exists()) {
                             binding.carNumber.text = "Unknown Vehicle Number"
                             binding.carModel.text = "Unknown Vehicle Model"
-                            binding.requestProgressBar.visibility = View.GONE
-                            binding.requestButton.isEnabled = true
-                            binding.requestButton.text = "Invalid Ride"
                             Toast.makeText(requireContext(), "Vehicle not found", Toast.LENGTH_SHORT).show()
                             return@addOnSuccessListener
                         }
@@ -155,128 +145,18 @@ class RideDetailsFragment : Fragment() {
                         // Update vehicle UI
                         binding.carNumber.text = vehicle.carNumber
                         binding.carModel.text = "${vehicle.carBrand} ${vehicle.carModel} - ${vehicle.color}"
-
-                        // Enable request button
-                        binding.requestProgressBar.visibility = View.GONE
-                        binding.requestButton.isEnabled = true
                     }
                     .addOnFailureListener { e ->
                         binding.carNumber.text = "Unknown Vehicle Number"
                         binding.carModel.visibility = View.GONE
-                        binding.requestProgressBar.visibility = View.GONE
-                        binding.requestButton.isEnabled = true
-                        binding.requestButton.text = "Invalid Ride"
                         Toast.makeText(requireContext(), "Failed to load vehicle details", Toast.LENGTH_SHORT).show()
                     }
             }
             .addOnFailureListener { e ->
                 binding.driverName.text = "Unknown Driver"
-                binding.requestProgressBar.visibility = View.GONE
-                binding.requestButton.isEnabled = true
-                binding.requestButton.text = "Invalid Ride"
                 Toast.makeText(requireContext(), "Failed to load driver details", Toast.LENGTH_SHORT).show()
             }
-
         passengersAdapter.submitList(ride.passengers)
-    }
-
-    private fun setupRequestButton() {
-        binding.requestButton.setOnClickListener {
-            if (binding.requestButton.text == "Invalid Ride") {
-                Toast.makeText(requireContext(), "This ride cannot be joined", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val currentUser = auth.currentUser ?: run {
-                Toast.makeText(requireContext(), "You need to be logged in", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            // Check if ride is full
-            if (ride.passengers.size >= ride.maxPassengers) {
-                Toast.makeText(requireContext(), "This ride is already full", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            // Check if user is already a passenger
-            if (ride.passengers.contains(currentUser.uid)) {
-                Toast.makeText(requireContext(), "You've already joined this ride", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            // Check female-only restriction
-            if (ride.femaleOnly) {
-                db.collection("users").document(currentUser.uid).get()
-                    .addOnSuccessListener { snapshot ->
-                        val userProfile = snapshot.toObject(UserProfile::class.java)
-                        if (userProfile?.gender != Gender.FEMALE) {
-                            Toast.makeText(requireContext(), "This ride is for females only", Toast.LENGTH_SHORT).show()
-                            return@addOnSuccessListener
-                        }
-                        checkExistingRequest()
-                    }
-                    .addOnFailureListener {
-                        Toast.makeText(requireContext(), "Failed to verify gender", Toast.LENGTH_SHORT).show()
-                    }
-            } else {
-                checkExistingRequest()
-            }
-        }
-    }
-
-    private fun checkExistingRequest() {
-        val currentUser = auth.currentUser ?: return
-
-        db.collection("rideRequests")
-            .whereEqualTo("rideId", rideId)
-            .whereEqualTo("passengerId", currentUser.uid)
-            .whereEqualTo("status", RequestStatus.PENDING)
-            .get()
-            .addOnSuccessListener { documents ->
-                if (documents.isEmpty) {
-                    createRideRequest()
-                } else {
-                    binding.statusIcon.visibility = View.VISIBLE
-                    binding.statusText.visibility = View.VISIBLE
-                    binding.requestButton.text = "Request Pending"
-                    Toast.makeText(requireContext(), "You already have a pending request for this ride", Toast.LENGTH_SHORT).show()
-                }
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(requireContext(), "Failed to check existing requests", Toast.LENGTH_SHORT).show()
-            }
-    }
-
-    private fun createRideRequest() {
-        val currentUser = auth.currentUser ?: run {
-            Toast.makeText(requireContext(), "Authentication required", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        binding.requestProgressBar.visibility = View.VISIBLE
-        binding.requestButton.isEnabled = false
-
-        val requestId = db.collection("rideRequests").document().id
-        val rideRequest = RideRequest(
-            requestId = requestId,
-            rideId = rideId,
-            passengerId = currentUser.uid,
-            driverId = ride.driverId,
-            status = RequestStatus.PENDING,
-            requestedAt = Timestamp.now()
-        )
-
-        db.collection("rideRequests").document(requestId).set(rideRequest)
-            .addOnSuccessListener {
-                binding.requestProgressBar.visibility = View.GONE
-                Toast.makeText(requireContext(), "Request sent successfully", Toast.LENGTH_SHORT).show()
-                findNavController().navigateUp()
-            }
-            .addOnFailureListener { e ->
-                binding.requestProgressBar.visibility = View.GONE
-                binding.requestButton.isEnabled = true
-                Toast.makeText(requireContext(), "Failed to send request: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
     }
 
     override fun onDestroyView() {

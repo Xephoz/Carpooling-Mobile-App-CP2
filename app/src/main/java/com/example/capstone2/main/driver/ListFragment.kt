@@ -39,8 +39,10 @@ class ListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         view.clearFocus()
         setupRecyclerView()
-        setupSwipeRefresh()
         setupCreateRideButton()
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            loadUserRides(showLoading = false, isInitialLoad = false)
+        }
         loadUserRides(showLoading = true, isInitialLoad = true)
     }
 
@@ -51,12 +53,6 @@ class ListFragment : Fragment() {
         binding.ridesRecyclerView.apply {
             adapter = ridesAdapter
             layoutManager = LinearLayoutManager(requireContext())
-        }
-    }
-
-    private fun setupSwipeRefresh() {
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            loadUserRides(showLoading = false, isInitialLoad = false)
         }
     }
 

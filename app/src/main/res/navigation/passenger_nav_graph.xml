@@ -17,6 +17,13 @@
             app:popUpTo="@id/browseFragment"
             app:popUpToSaveState="true"
             app:restoreState="true" />
+        <action
+            android:id="@+id/action_browseFragment_to_selectedFragment"
+            app:destination="@id/selectedFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/browseFragment"
+            app:popUpToSaveState="true"
+            app:restoreState="true" />
     </fragment>
 
     <fragment

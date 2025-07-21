@@ -65,6 +65,7 @@ class BrowseFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
+        setupViewRequestsButton()
         setupSwipeRefresh()
         setupSearchBar()
         setupSortButton()
@@ -115,6 +116,12 @@ class BrowseFragment : Fragment() {
         }
     }
 
+    private fun setupViewRequestsButton() {
+        binding.viewRequestsButton.setOnClickListener {
+            findNavController().navigate(R.id.action_browseFragment_to_selectedFragment)
+        }
+    }
+
     private fun setupSwipeRefresh() {
         binding.swipeRefreshLayout.setOnRefreshListener {
             if (hasLocationPermissions()) {
@@ -146,6 +153,7 @@ class BrowseFragment : Fragment() {
 
     private fun setupSearchBar() {
         binding.searchBar.setOnClickListener {
+            Toast.makeText(context, "Search by location coming soon", Toast.LENGTH_SHORT).show()
             // TODO: Implement search functionality
         }
     }
@@ -288,54 +296,72 @@ class BrowseFragment : Fragment() {
 
         val localLocation = currentLocation
 
-        db.collection("rides")
-            .whereNotEqualTo("driverId", currentUserId)
-            .whereEqualTo("status", "ACTIVE")
+        // First fetch all ride requests made by current user
+        db.collection("rideRequests")
+            .whereEqualTo("passengerId", currentUserId)
             .get()
-            .addOnCompleteListener { task ->
+            .addOnSuccessListener { requestsSnapshot ->
+                val requestedRideIds = requestsSnapshot.documents.mapNotNull { doc ->
+                    doc.getString("rideId")
+                }.toSet()
+
+                // Now fetch all available rides excluding those already requested
+                db.collection("rides")
+                    .whereNotEqualTo("driverId", currentUserId)
+                    .whereEqualTo("status", "ACTIVE")
+                    .get()
+                    .addOnCompleteListener { task ->
+                        viewModel.setLoading(false)
+                        val wasRefreshing = binding.swipeRefreshLayout.isRefreshing
+                        binding.swipeRefreshLayout.isRefreshing = false
+
+                        if (task.isSuccessful) {
+                            val rides = task.result?.documents?.mapNotNull { doc ->
+                                doc.toObject(Ride::class.java)?.let { ride ->
+                                    doc.id to ride
+                                }
+                            }?.filterNot { (rideId, _) ->
+                                rideId in requestedRideIds
+                            } ?: emptyList()
+
+                            val sortedRides = if (localLocation != null) {
+                                rides.map { (id, ride) ->
+                                    RideWithDistance(
+                                        documentId = id,
+                                        ride = ride,
+                                        distance = localLocation.distanceTo(ride.startLocation.geoPoint)
+                                    )
+                                }.sortedWith(compareBy<RideWithDistance> { it.distance }
+                                    .thenBy { it.ride.departureTime })
+                                    .map { it.documentId to it.ride }
+                            } else {
+                                rides.sortedBy { (_, ride) -> ride.departureTime }
+                            }
+
+                            // Save to ViewModel
+                            viewModel.setRides(sortedRides)
+                            viewModel.setCurrentLocation(localLocation)
+
+                            if (sortedRides.isEmpty()) {
+                                ridesAdapter.submitList(emptyList())
+                                Toast.makeText(context, "No available rides found", Toast.LENGTH_SHORT).show()
+                            } else {
+                                ridesAdapter.submitList(sortedRides)
+                                if (wasRefreshing || showRefreshToast) {
+                                    Toast.makeText(context, "Refreshed list", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        } else {
+                            Log.w(tag, "Error getting rides", task.exception)
+                            Toast.makeText(context, "Error loading rides", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+            }
+            .addOnFailureListener { e ->
                 viewModel.setLoading(false)
-                val wasRefreshing = binding.swipeRefreshLayout.isRefreshing
                 binding.swipeRefreshLayout.isRefreshing = false
-
-                if (task.isSuccessful) {
-                    val rides = task.result?.documents?.mapNotNull { doc ->
-                        doc.toObject(Ride::class.java)?.let { ride ->
-                            doc.id to ride
-                        }
-                    } ?: emptyList()
-
-                    val sortedRides = if (localLocation != null) {
-                        rides.map { (id, ride) ->
-                            RideWithDistance(
-                                documentId = id,
-                                ride = ride,
-                                distance = localLocation.distanceTo(ride.startLocation.geoPoint)
-                            )
-                        }.sortedWith(compareBy<RideWithDistance> { it.distance }
-                            .thenBy { it.ride.departureTime })
-                            .map { it.documentId to it.ride }
-                    } else {
-                        rides.sortedBy { (_, ride) -> ride.departureTime }
-                    }
-
-                    // Save to ViewModel
-                    viewModel.setRides(sortedRides)
-                    viewModel.setCurrentLocation(localLocation)
-
-                    if (sortedRides.isEmpty()) {
-                        ridesAdapter.submitList(emptyList())
-                        Toast.makeText(context, "No available rides found", Toast.LENGTH_SHORT).show()
-                    } else {
-                        ridesAdapter.submitList(sortedRides)
-                        // Show toast if it was a refresh action OR explicitly requested
-                        if (wasRefreshing || showRefreshToast) {
-                            Toast.makeText(context, "Refreshed list", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                } else {
-                    Log.w(tag, "Error getting rides", task.exception)
-                    Toast.makeText(context, "Error loading rides", Toast.LENGTH_SHORT).show()
-                }
+                Log.w(tag, "Error getting ride requests", e)
+                Toast.makeText(context, "Error loading ride requests", Toast.LENGTH_SHORT).show()
             }
     }
 
