@@ -45,6 +45,7 @@ class SettingsFragment : Fragment() {
 
         // TODO: Navigate to view vehicles
         view.findViewById<View>(R.id.myVehiclesContainer).setOnClickListener {
+            Toast.makeText(context, "TODO: Manage vehicles", Toast.LENGTH_SHORT).show()
         }
     }
 

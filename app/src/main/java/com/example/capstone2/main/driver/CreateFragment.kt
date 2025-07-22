@@ -18,6 +18,7 @@ import com.example.capstone2.databinding.DriverCreateBinding
 import com.example.capstone2.model.LocationInfo
 import com.example.capstone2.model.Ride
 import com.example.capstone2.model.University
+import com.example.capstone2.model.Vehicle
 import com.example.capstone2.viewmodels.CreateRideViewModel
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
@@ -42,6 +43,7 @@ class CreateFragment : Fragment() {
     private val binding get() = _binding!!
     private val db = Firebase.firestore
     private var universities: List<University> = emptyList()
+    private var vehicles: List<Vehicle> = emptyList()
     private lateinit var placesClient: PlacesClient
     private val tag = "CreateRideFragment"
 
@@ -76,6 +78,7 @@ class CreateFragment : Fragment() {
 
         setupStartLocationAutocomplete()
         fetchUniversities()
+        fetchVehicles()
         setupDateTimePicker()
         restoreFromViewModel()
 
@@ -143,7 +146,12 @@ class CreateFragment : Fragment() {
         }
 
         // Restore other fields
-        viewModel.vehicleId?.let { binding.setVehicle.setText(it) }
+        viewModel.selectedVehicleId?.let { vehicleId ->
+            vehicles.find { it.id == vehicleId }?.let { vehicle ->
+                binding.vehicleDropdownInput.setText(vehicle.carNumber)
+            }
+        }
+
         viewModel.maxPassengers?.let { binding.setMaxPassengers.setText(it.toString()) }
         binding.setFemaleOnly.isChecked = viewModel.femaleOnly
 
@@ -334,6 +342,82 @@ class CreateFragment : Fragment() {
         binding.startDropdownInput.setOnClickListener { binding.startDropdownInput.showDropDown() }
     }
 
+    private fun fetchVehicles() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+        db.collection("vehicles")
+            .whereEqualTo("driverId", userId)
+            .get()
+            .addOnSuccessListener { result ->
+                vehicles = result.map { document ->
+                    document.toObject(Vehicle::class.java).copy(id = document.id)
+                }
+                setupVehicleDropdown()
+            }
+            .addOnFailureListener { exception ->
+                Log.e(tag, "Error fetching vehicles", exception)
+                vehicles = emptyList()
+                setupVehicleDropdown()
+            }
+    }
+
+    private fun setupVehicleDropdown() {
+        val isEmpty = vehicles.isEmpty()
+        val items = if (isEmpty) {
+            listOf("Please register your vehicle in Settings")
+        } else {
+            vehicles.map { it.carNumber }
+        }
+
+        val adapter = object : ArrayAdapter<String>(
+            requireContext(),
+            android.R.layout.simple_dropdown_item_1line,
+            items
+        ) {
+            override fun isEnabled(position: Int): Boolean {
+                // Only allow selection if we have actual vehicles
+                return !isEmpty
+            }
+
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getView(position, convertView, parent)
+                if (isEmpty) {
+                    view.setOnClickListener {
+                        Toast.makeText(context, "Please register a vehicle in Settings", Toast.LENGTH_SHORT).show()
+                        // Optional: Add navigation to settings here
+                        // findNavController().navigate(R.id.action_to_settings)
+                    }
+                }
+                return view
+            }
+        }
+
+        binding.vehicleDropdownInput.setAdapter(adapter)
+
+        binding.vehicleDropdownInput.setOnItemClickListener { _, _, position, _ ->
+            if (!isEmpty) {
+                viewModel.selectedVehicleId = vehicles[position].id
+                binding.vehicleDropdown.error = null
+            }
+        }
+
+        binding.vehicleDropdownInput.setOnClickListener {
+            binding.vehicleDropdownInput.showDropDown()
+        }
+
+        // Clear text if no vehicles (but don't show the message in the input)
+        if (isEmpty) {
+            binding.vehicleDropdownInput.text?.clear()
+        } else {
+            // Restore selection if available
+            viewModel.selectedVehicleId?.let { selectedId ->
+                vehicles.find { it.id == selectedId }?.let { selectedVehicle ->
+                    binding.vehicleDropdownInput.setText(selectedVehicle.carNumber, false)
+                }
+            }
+        }
+    }
+
     private fun setupDateTimePicker() {
         binding.setDate.setOnClickListener {
             showDatePicker()
@@ -461,15 +545,17 @@ class CreateFragment : Fragment() {
             }
         }
 
-        val vehicleId = binding.setVehicle.text.toString()
-            .takeIf { it.isNotBlank() }
-            ?.uppercase()
-            ?: run {
-                binding.setVehicle.error = "Please enter vehicle info"
-                showError("Vehicle information required")
-                return
-            }
-        viewModel.vehicleId = vehicleId
+        if (vehicles.isEmpty()) {
+            binding.vehicleDropdown.error = " "
+            Toast.makeText(context, "Please register a vehicle first", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val selectedVehicleId = viewModel.selectedVehicleId ?: run {
+            binding.vehicleDropdown.error = " "
+            showError("Vehicle selection required")
+            return
+        }
 
         val maxPassengers = binding.setMaxPassengers.text.toString().toIntOrNull()?.takeIf { it in 1..8 } ?: run {
             binding.setMaxPassengers.error = "Please enter a number (1-8)"
@@ -497,7 +583,7 @@ class CreateFragment : Fragment() {
             // Normal mode: start is geoPoint, end is university
             Ride(
                 driverId = driverId,
-                vehicleId = vehicleId,
+                vehicleId = selectedVehicleId,
                 startLocation = LocationInfo(
                     displayName = startPlace.name ?: "",
                     fullAddress = startPlace.address ?: "",
@@ -522,7 +608,7 @@ class CreateFragment : Fragment() {
             // Swapped mode: start is university, end is geoPoint
             Ride(
                 driverId = driverId,
-                vehicleId = vehicleId,
+                vehicleId = selectedVehicleId,
                 startLocation = LocationInfo(
                     displayName = selectedUniversity.name,
                     universityId = selectedUniversity.id,
@@ -583,8 +669,8 @@ class CreateFragment : Fragment() {
             binding.endDropdown.hint = "Select destination"
         }
 
-        binding.setVehicle.text?.clear()
-        binding.setVehicle.error = null
+        binding.vehicleDropdownInput.text?.clear()
+        binding.vehicleDropdownInput.error = null
 
         binding.setMaxPassengers.text?.clear()
         binding.setMaxPassengers.error = null
@@ -593,6 +679,8 @@ class CreateFragment : Fragment() {
         binding.setFemaleOnly.isChecked = false
 
         viewModel.clear()
+
+        findNavController().navigateUp()
     }
 
     override fun onDestroyView() {

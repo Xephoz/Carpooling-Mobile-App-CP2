@@ -142,6 +142,7 @@
                     android:id="@+id/endBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
                     android:layout_marginHorizontal="40dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -149,7 +150,7 @@
                     app:layout_constraintBottom_toBottomOf="parent">
 
                     <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+                        style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
                         android:id="@+id/endDropdown"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -226,31 +227,34 @@
                     android:background="@color/surface_3" />
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/vehicleDropdown"
+                    style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Select vehicle"
                     android:textColorHint="@color/gray_font"
-                    app:boxBackgroundMode="none"
-                    app:hintTextColor="@color/white">
+                    android:hint="Select vehicle"
+                    app:hintTextColor="@color/white"
+                    app:errorEnabled="true"
+                    app:errorIconTint="@android:color/transparent"
+                    app:endIconTint="@color/primary_5"
+                    app:boxBackgroundMode="outline">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/setVehicle"
+                    <AutoCompleteTextView
+                        android:id="@+id/vehicleDropdownInput"
                         android:layout_width="match_parent"
                         android:layout_height="45dp"
                         android:background="@drawable/rounded_corners_black"
                         android:drawableStart="@drawable/outline_directions_car_filled_24"
                         android:drawablePadding="10dp"
-                        android:fontFamily="sans-serif"
+                        android:inputType="none"
                         android:padding="0dp"
                         android:textColor="@color/gray_font"
-                        android:textSize="18sp"
-                        android:inputType="textCapCharacters"/>
+                        android:textSize="18sp"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
                     android:hint="Set max passengers"
                     android:textColorHint="@color/gray_font"
                     app:boxBackgroundMode="none"
@@ -273,7 +277,7 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="20dp"
                     android:clickable="true"
                     android:focusable="false"
                     android:hint="Select departure time"
@@ -303,7 +307,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="43dp"
                     android:layout_marginTop="20dp"
-                    android:layout_marginBottom="40dp"
+                    android:layout_marginBottom="30dp"
                     android:paddingHorizontal="17dp"
                     android:text="Female only ride"
                     android:textColor="@color/white"

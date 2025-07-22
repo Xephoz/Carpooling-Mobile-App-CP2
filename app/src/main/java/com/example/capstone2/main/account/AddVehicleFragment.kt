@@ -5,13 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.example.capstone2.R
 import com.example.capstone2.databinding.AccountAddVehicleBinding
 import com.example.capstone2.model.Vehicle
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -108,10 +105,9 @@ class AddVehicleFragment : Fragment() {
                         val vehicle = Vehicle(
                             driverId = user.uid,
                             carNumber = formattedNumberPlate,
-                            carBrand = formattedBrand,
                             carModel = formattedModel,
+                            carBrand = formattedBrand,
                             color = formattedColor,
-                            conditionRating = null
                         )
 
                         // Add vehicle to Firestore

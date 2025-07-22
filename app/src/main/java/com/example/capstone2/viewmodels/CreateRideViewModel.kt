@@ -9,10 +9,9 @@ class CreateRideViewModel : ViewModel() {
     var selectedDateTime: Calendar = Calendar.getInstance()
     var isDateTimeSelected: Boolean = false
     var selectedUniversityName: String? = null
-    var vehicleId: String? = null
+    var selectedVehicleId: String? = null  // Changed from vehicleId to selectedVehicleId for clarity
     var maxPassengers: Int? = null
     var femaleOnly: Boolean = false
-
     var isSwapped = false
 
     fun clear() {
@@ -20,10 +19,9 @@ class CreateRideViewModel : ViewModel() {
         selectedDateTime = Calendar.getInstance()
         isDateTimeSelected = false
         selectedUniversityName = null
-        vehicleId = null
+        selectedVehicleId = null  // Updated to match new property name
         maxPassengers = null
         femaleOnly = false
-
         isSwapped = false
     }
 }
