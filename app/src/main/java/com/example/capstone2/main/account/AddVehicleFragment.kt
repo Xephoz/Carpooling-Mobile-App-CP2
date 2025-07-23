@@ -62,7 +62,7 @@ class AddVehicleFragment : Fragment() {
             return
         }
 
-        if (!vehicleBrand.matches(Regex("^[a-zA-Z0-9]+$"))) {
+        if (!vehicleNumber.matches(Regex("^[a-zA-Z0-9]+$"))) {
             binding.vehicleNumber.error = "Only letters and numbers allowed"
             showToast("Invalid number plate")
             enableButton()
@@ -76,7 +76,7 @@ class AddVehicleFragment : Fragment() {
             return
         }
 
-        if (!vehicleBrand.matches(Regex("^[a-zA-Z]+$"))) {
+        if (!vehicleColor.matches(Regex("^[a-zA-Z]+$"))) {
             binding.vehicleColor.error = "Only letters allowed."
             showToast("Invalid vehicle color")
             enableButton()
