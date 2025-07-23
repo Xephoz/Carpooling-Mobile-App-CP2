@@ -70,8 +70,15 @@ class AddVehicleFragment : Fragment() {
         }
 
         if (!vehicleBrand.matches(Regex("^[a-zA-Z0-9 ]+$"))) {
-            binding.vehicleBrand.error = "Only letters and numbers allowed"
+            binding.vehicleBrand.error = "Only letters, numbers and spaces allowed"
             showToast("Invalid vehicle brand")
+            enableButton()
+            return
+        }
+
+        if (!vehicleModel.matches(Regex("^[a-zA-Z0-9 ]+$"))) {
+            binding.vehicleModel.error = "Only letters, numbers and spaces allowed"
+            showToast("Invalid vehicle model")
             enableButton()
             return
         }
