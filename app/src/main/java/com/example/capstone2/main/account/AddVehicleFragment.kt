@@ -69,7 +69,7 @@ class AddVehicleFragment : Fragment() {
             return
         }
 
-        if (!vehicleBrand.matches("^[a-zA-Z0-9 ]+\$".toRegex())) {
+        if (!vehicleBrand.matches(Regex("^[a-zA-Z0-9 ]+$"))) {
             binding.vehicleBrand.error = "Only letters and numbers allowed"
             showToast("Invalid vehicle brand")
             enableButton()
