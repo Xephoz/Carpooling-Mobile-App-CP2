@@ -191,6 +191,7 @@ class RideDetailsFragment : Fragment() {
 
             // Check if ride is full
             if (ride.passengers.size >= ride.maxPassengers) {
+                binding.requestButton.text = "This ride is already full"
                 Toast.makeText(requireContext(), "This ride is already full", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }

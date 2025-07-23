@@ -299,6 +299,7 @@ class BrowseFragment : Fragment() {
         // First fetch all ride requests made by current user
         db.collection("rideRequests")
             .whereEqualTo("passengerId", currentUserId)
+            .whereNotEqualTo("status", "REJECTED")
             .get()
             .addOnSuccessListener { requestsSnapshot ->
                 val requestedRideIds = requestsSnapshot.documents.mapNotNull { doc ->

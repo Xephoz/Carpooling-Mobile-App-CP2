@@ -89,10 +89,7 @@ class CreatedRideDetailsFragment : Fragment() {
                     return@addOnSuccessListener
                 }
 
-                // Update UI with ride details
                 updateRideUI()
-
-                // Fetch driver and vehicle details
                 fetchDriverAndVehicleDetails()
                 loadRequests()
             }
@@ -140,7 +137,7 @@ class CreatedRideDetailsFragment : Fragment() {
 
         binding.passengerCount.text = "[${ride.passengers.size}/${ride.maxPassengers}]"
 
-        // Show/hide passengers section based on whether there are passengers
+        // Update passengers RecyclerView visibility
         if (ride.passengers.isNotEmpty()) {
             binding.passengersRecyclerView.visibility = View.VISIBLE
             binding.passengerEmpty.visibility = View.GONE
@@ -148,6 +145,8 @@ class CreatedRideDetailsFragment : Fragment() {
             binding.passengersRecyclerView.visibility = View.GONE
             binding.passengerEmpty.visibility = View.VISIBLE
         }
+
+        passengersAdapter.submitList(ride.passengers)
     }
 
     private fun fetchDriverAndVehicleDetails() {
@@ -185,15 +184,6 @@ class CreatedRideDetailsFragment : Fragment() {
                 binding.driverName.text = "Unknown Driver"
                 Toast.makeText(requireContext(), "Failed to load driver details", Toast.LENGTH_SHORT).show()
             }
-        passengersAdapter.submitList(ride.passengers)
-
-        if (ride.passengers.isNotEmpty()) {
-            binding.passengersRecyclerView.visibility = View.VISIBLE
-            binding.passengerEmpty.visibility = View.GONE
-        } else {
-            binding.passengersRecyclerView.visibility = View.GONE
-            binding.passengerEmpty.visibility = View.VISIBLE
-        }
     }
 
     private fun loadRequests() {
@@ -206,12 +196,30 @@ class CreatedRideDetailsFragment : Fragment() {
                 Log.d("Requests", "Loaded ${requests.size} requests")
                 requestsAdapter.submitList(requests)
 
-                // Show/hide section based on requests
-                binding.requestsContainer.visibility = if (requests.isEmpty()) View.GONE else View.VISIBLE
+                // Check ride full status
+                if (ride.passengers.size >= ride.maxPassengers) {
+                    binding.requestsFull.visibility = View.VISIBLE
+                    binding.requestsEmpty.visibility = View.GONE
+                    binding.requestsRecyclerView.visibility = View.GONE
+                } else {
+                    if (requests.isEmpty()) {
+                        binding.requestsFull.visibility = View.GONE
+                        binding.requestsEmpty.visibility = View.VISIBLE
+                        binding.requestsRecyclerView.visibility = View.GONE
+                    } else {
+                        binding.requestsFull.visibility = View.GONE
+                        binding.requestsEmpty.visibility = View.GONE
+                        binding.requestsRecyclerView.visibility = View.VISIBLE
+                    }
+                }
             }
             .addOnFailureListener { e ->
                 Toast.makeText(requireContext(), "Failed to load requests: ${e.message}", Toast.LENGTH_SHORT).show()
                 Log.e("Requests", "Error loading requests", e)
+                // On error, still show empty state
+                binding.requestsFull.visibility = View.GONE
+                binding.requestsRecyclerView.visibility = View.GONE
+                binding.requestsEmpty.visibility = View.VISIBLE
             }
     }
 

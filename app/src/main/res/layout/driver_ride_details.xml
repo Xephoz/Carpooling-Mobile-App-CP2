@@ -325,7 +325,30 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         tools:itemCount="1"
-                        tools:listitem="@layout/item_passenger"/>
+                        tools:listitem="@layout/item_passenger"
+                        android:visibility="gone"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/requestsEmpty"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="20dp"
+                        android:text="No carpool requests received yet"
+                        android:textColor="@color/primary_5"
+                        app:layout_constraintTop_toBottomOf="@id/requestsText"
+                        android:visibility="visible"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/requestsFull"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="20dp"
+                        android:text="This ride has reached the maximum passengers set"
+                        android:textColor="@color/primary_5"
+                        app:layout_constraintTop_toBottomOf="@id/requestsText"
+                        android:visibility="gone"/>
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -375,7 +398,7 @@
                         app:layout_constraintTop_toBottomOf="@id/passengerText"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        tools:itemCount="2"
+                        tools:itemCount="3"
                         tools:listitem="@layout/item_passenger"
                         android:visibility="gone"/>
 
