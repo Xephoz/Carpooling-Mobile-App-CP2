@@ -57,24 +57,28 @@ class AddVehicleFragment : Fragment() {
         // Ensure values are alphanumeric
         if (vehicleNumber.contains(" ")) {
             binding.vehicleNumber.error = "Number plate cannot contain spaces"
+            showToast("Invalid number plate")
             enableButton()
             return
         }
 
-        if (!vehicleNumber.matches("^[a-zA-Z0-9]+\$".toRegex())) {
+        if (!vehicleBrand.matches(Regex("^[a-zA-Z0-9]+$"))) {
             binding.vehicleNumber.error = "Only letters and numbers allowed"
+            showToast("Invalid number plate")
             enableButton()
             return
         }
 
         if (!vehicleBrand.matches("^[a-zA-Z0-9 ]+\$".toRegex())) {
-            binding.vehicleBrand.error = "Only letters, numbers and spaces allowed"
+            binding.vehicleBrand.error = "Only letters and numbers allowed"
+            showToast("Invalid vehicle brand")
             enableButton()
             return
         }
 
-        if (!vehicleColor.matches("^[a-zA-Z]+\$".toRegex())) {
+        if (!vehicleBrand.matches(Regex("^[a-zA-Z]+$"))) {
             binding.vehicleColor.error = "Only letters allowed."
+            showToast("Invalid vehicle color")
             enableButton()
             return
         }
@@ -130,6 +134,7 @@ class AddVehicleFragment : Fragment() {
                 } else {
                     enableButton()
                     binding.vehicleNumber.error = "This number plate is already registered"
+                    showToast("Please use a different number plate.")
                 }
             }
             .addOnFailureListener { e ->
