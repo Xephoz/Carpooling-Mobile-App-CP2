@@ -11,6 +11,7 @@ data class UserProfile(
     val firstName: String = "",
     val lastName: String = "",
     val email: String = "",
+    val normalizedEmail: String = "",
     val phoneNumber: String? = null,
     val gender: Gender? = null,
     val university: String = "",
