@@ -40,7 +40,12 @@ class RidesAdapter(private val onItemClick: (String, Ride) -> Unit) :
                     .filter { it.isNotEmpty() }
                     .joinToString(" - ")
             }
-            endLocationText.text = ride.endLocation.displayName
+            endLocationText.text = when {
+                ride.endLocation.fullAddress.startsWith(ride.endLocation.displayName) -> ride.endLocation.fullAddress
+                else -> listOf(ride.endLocation.displayName, ride.endLocation.fullAddress)
+                    .filter { it.isNotEmpty() }
+                    .joinToString(" - ")
+            }
 
             val dateFormat = SimpleDateFormat("MMM dd, yyyy hh:mm a", Locale.getDefault())
             departureTimeText.text = "Departure Time: ${dateFormat.format(ride.departureTime.toDate())}"

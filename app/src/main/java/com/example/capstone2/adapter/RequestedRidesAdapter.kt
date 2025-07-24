@@ -48,7 +48,13 @@ class RequestedRidesAdapter(
                     .filter { it.isNotEmpty() }
                     .joinToString(" - ")
             }
-            endLocationText.text = ride.endLocation.displayName
+            endLocationText.text = when {
+                ride.endLocation.fullAddress.startsWith(ride.endLocation.displayName) ->
+                    ride.endLocation.fullAddress
+                else -> listOf(ride.endLocation.displayName, ride.endLocation.fullAddress)
+                    .filter { it.isNotEmpty() }
+                    .joinToString(" - ")
+            }
 
             // Set departure time
             val dateFormat = SimpleDateFormat("MMM dd, yyyy hh:mm a", Locale.getDefault())

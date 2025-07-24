@@ -124,9 +124,20 @@ class CreatedRideDetailsFragment : Fragment() {
     }
 
     private fun updateRideUI() {
-        binding.startLocation.text = ride.startLocation.displayName
-        binding.endLocation.text = ride.endLocation.displayName
-
+        binding.startLocation.text = when {
+            ride.startLocation.fullAddress.startsWith(ride.startLocation.displayName) ->
+                ride.startLocation.fullAddress
+            else -> listOf(ride.startLocation.displayName, ride.startLocation.fullAddress)
+                .filter { it.isNotEmpty() }
+                .joinToString(" - ")
+        }
+        binding.endLocation.text = when {
+            ride.endLocation.fullAddress.startsWith(ride.endLocation.displayName) ->
+                ride.endLocation.fullAddress
+            else -> listOf(ride.endLocation.displayName, ride.endLocation.fullAddress)
+                .filter { it.isNotEmpty() }
+                .joinToString(" - ")
+        }
         val date = ride.departureTime.toDate()
         val dateFormat = SimpleDateFormat("MMMM d, yyyy 'at' h:mm a", Locale.getDefault()).apply {
             timeZone = TimeZone.getDefault()
