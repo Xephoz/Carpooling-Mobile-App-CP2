@@ -258,10 +258,10 @@ class CreatedRideDetailsFragment : Fragment() {
                         querySnapshot.documents.forEach { doc ->
                             batch.update(doc.reference, "status", RequestStatus.REJECTED.name)
                         }
-                        commitBatch(batch, onComplete)
+                        commitBatch(batch, onComplete, newStatus)
                     }
                     .addOnFailureListener { e ->
-                        commitBatch(batch, onComplete)
+                        commitBatch(batch, onComplete, newStatus)
                     }
             } else {
                 db.collection("rideRequests")
@@ -274,28 +274,36 @@ class CreatedRideDetailsFragment : Fragment() {
                         querySnapshot.documents.forEach { doc ->
                             batch.update(doc.reference, "status", RequestStatus.REJECTED.name)
                         }
-                        commitBatch(batch, onComplete)
+                        commitBatch(batch, onComplete, newStatus)
                     }
             }
         } else {
-            commitBatch(batch, onComplete)
+            commitBatch(batch, onComplete, newStatus)
         }
     }
 
-    private fun commitBatch(batch: WriteBatch, onComplete: () -> Unit) {
+    private fun commitBatch(batch: WriteBatch, onComplete: () -> Unit, status: RequestStatus) {
         batch.commit()
             .addOnSuccessListener {
-                val updatedPassengerCount = ride.passengers.size + 1
-                val isLastPassenger = updatedPassengerCount >= ride.maxPassengers
+                when (status) {
+                    RequestStatus.CONFIRMED -> {
+                        val updatedPassengerCount = ride.passengers.size + 1
+                        val isLastPassenger = updatedPassengerCount >= ride.maxPassengers
 
-                // Combine messages if it's the last passenger
-                val message = if (isLastPassenger) {
-                    "Request accepted successfully.\nRemaining requests have been rejected automatically."
-                } else {
-                    "Request accepted successfully."
+                        // Combine messages if it's the last passenger
+                        val message = if (isLastPassenger) {
+                            "Request accepted successfully.\nRemaining requests have been rejected automatically."
+                        } else {
+                            "Request accepted successfully."
+                        }
+
+                        showSnackbar(message, R.color.confirmed_request)
+                    }
+                    RequestStatus.REJECTED -> {
+                        showSnackbar("Request rejected successfully.", R.color.rejected_request)
+                    }
+                    else -> {}
                 }
-
-                showSuccessSnackbar(message)
                 refreshData()
                 onComplete()
             }
@@ -309,7 +317,7 @@ class CreatedRideDetailsFragment : Fragment() {
             }
     }
 
-    private fun showSuccessSnackbar(message: String) {
+    private fun showSnackbar(message: String, backgroundColorRes: Int) {
         // Set duration to 5 seconds (5000ms)
         val durationMs = 5000
         val snackbar = Snackbar.make(binding.root, message, Snackbar.LENGTH_INDEFINITE).apply {
@@ -320,7 +328,7 @@ class CreatedRideDetailsFragment : Fragment() {
                 layoutParams = (layoutParams as ViewGroup.MarginLayoutParams).apply {
                     bottomMargin = resources.getDimensionPixelSize(R.dimen.snackbar_margin_bottom)
                 }
-                setBackgroundColor(ContextCompat.getColor(context, R.color.confirmed_request))
+                setBackgroundColor(ContextCompat.getColor(context, backgroundColorRes))
 
                 // Enable multi-line text
                 findViewById<TextView>(com.google.android.material.R.id.snackbar_text)?.apply {

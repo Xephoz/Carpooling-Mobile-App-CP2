@@ -15,6 +15,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.firestore.FirebaseFirestore
+import java.util.Locale
 
 class RegisterFragment : Fragment() {
 
@@ -44,8 +45,8 @@ class RegisterFragment : Fragment() {
             binding.registerButton.isEnabled = false // Disable button to prevent spamming
             registerProgressBar.visibility = View.VISIBLE
 
-            val firstName = binding.firstName.text.toString().trim()
-            val lastName = binding.lastName.text.toString().trim()
+            val firstName = capitalizeFirstLetter(binding.firstName.text.toString().trim())
+            val lastName = capitalizeFirstLetter(binding.lastName.text.toString().trim())
             val email = binding.registerEmail.text.toString().trim().lowercase()
             val password = binding.registerPassword.text.toString()
             val confirmPassword = binding.registerConfirm.text.toString()
@@ -53,7 +54,11 @@ class RegisterFragment : Fragment() {
             if (firstName.isNotEmpty() && lastName.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty()) {
                 // Email domain restriction
                 if (!email.endsWith("@imail.sunway.edu.my")) {
-                    Toast.makeText(requireContext(), "Only @imail.sunway.edu.my emails are allowed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Only @imail.sunway.edu.my emails are allowed",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     binding.registerButton.isEnabled = true
                     registerProgressBar.visibility = View.GONE
                     return@setOnClickListener
@@ -65,7 +70,11 @@ class RegisterFragment : Fragment() {
                 // Check if email already exists (including + aliases)
                 checkEmailExists(normalizedEmail) { exists ->
                     if (exists) {
-                        Toast.makeText(requireContext(), "This email is already registered", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            requireContext(),
+                            "This email is already registered",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         binding.registerButton.isEnabled = true
                         registerProgressBar.visibility = View.GONE
                         return@checkEmailExists
@@ -77,59 +86,82 @@ class RegisterFragment : Fragment() {
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
                                     val user = firebaseAuth.currentUser
-                                    user?.sendEmailVerification()?.addOnCompleteListener { emailTask ->
-                                        if (emailTask.isSuccessful) {
-                                            // Save to Firestore with normalized email
-                                            val uid = user.uid
-                                            val userProfile = UserProfile(
-                                                firstName = firstName,
-                                                lastName = lastName,
-                                                email = email,
-                                                normalizedEmail = normalizedEmail, // Store normalized version
-                                                uid = uid
-                                            )
-                                            db.collection("users").document(uid).set(userProfile)
-                                                .addOnSuccessListener {
-                                                    Toast.makeText(requireContext(), "Verification email sent. Please check your inbox.", Toast.LENGTH_LONG).show()
-                                                    firebaseAuth.signOut()
-                                                    findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
-                                                }
-                                                .addOnFailureListener {
-                                                    Toast.makeText(requireContext(), "Failed to save profile info.", Toast.LENGTH_SHORT).show()
-                                                    binding.registerButton.isEnabled = true
-                                                    registerProgressBar.visibility = View.GONE
-                                                }
-                                        } else {
-                                            Toast.makeText(requireContext(), "Failed to send verification email.", Toast.LENGTH_SHORT).show()
-                                            binding.registerButton.isEnabled = true
-                                            registerProgressBar.visibility = View.GONE
+                                    user?.sendEmailVerification()
+                                        ?.addOnCompleteListener { emailTask ->
+                                            if (emailTask.isSuccessful) {
+                                                // Save to Firestore with normalized email
+                                                val uid = user.uid
+                                                val userProfile = UserProfile(
+                                                    firstName = firstName,
+                                                    lastName = lastName,
+                                                    email = email,
+                                                    normalizedEmail = normalizedEmail, // Store normalized version
+                                                    uid = uid
+                                                )
+                                                db.collection("users").document(uid)
+                                                    .set(userProfile)
+                                                    .addOnSuccessListener {
+                                                        Toast.makeText(
+                                                            requireContext(),
+                                                            "Verification email sent. Please check your inbox.",
+                                                            Toast.LENGTH_LONG
+                                                        ).show()
+                                                        firebaseAuth.signOut()
+                                                        findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
+                                                    }
+                                                    .addOnFailureListener {
+                                                        Toast.makeText(
+                                                            requireContext(),
+                                                            "Failed to save profile info.",
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+                                                        binding.registerButton.isEnabled = true
+                                                        registerProgressBar.visibility = View.GONE
+                                                    }
+                                            } else {
+                                                Toast.makeText(
+                                                    requireContext(),
+                                                    "Failed to send verification email.",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                                binding.registerButton.isEnabled = true
+                                                registerProgressBar.visibility = View.GONE
+                                            }
                                         }
-                                    }
                                 } else {
                                     val errorMessage = when (val exception = task.exception) {
                                         is FirebaseAuthWeakPasswordException -> "Password must be at least 6 characters."
                                         is FirebaseAuthInvalidCredentialsException -> "Invalid email format."
                                         is FirebaseAuthUserCollisionException -> "This email is already registered."
-                                        else -> exception?.localizedMessage ?: "Signup failed. Please try again."
+                                        else -> exception?.localizedMessage
+                                            ?: "Signup failed. Please try again."
                                     }
-                                    Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        requireContext(),
+                                        errorMessage,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                     binding.registerButton.isEnabled = true
                                     registerProgressBar.visibility = View.GONE
                                 }
                             }
                     } else {
-                        Toast.makeText(requireContext(), "Passwords do not match", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            requireContext(),
+                            "Passwords do not match",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         binding.registerButton.isEnabled = true
                         registerProgressBar.visibility = View.GONE
                     }
                 }
             } else {
-                Toast.makeText(requireContext(), "All fields are required", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "All fields are required", Toast.LENGTH_SHORT)
+                    .show()
                 binding.registerButton.isEnabled = true
                 registerProgressBar.visibility = View.GONE
             }
         }
-
         binding.loginRedirectText.setOnClickListener {
             findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
         }
@@ -155,6 +187,15 @@ class RegisterFragment : Fragment() {
             .addOnFailureListener {
                 callback(false)
             }
+    }
+
+    private fun capitalizeFirstLetter(str: String): String {
+        return str.split(" ").joinToString(" ") { word ->
+            word.replaceFirstChar {
+                if (it.isLowerCase()) it.titlecase(Locale.getDefault())
+                else it.toString()
+            }
+        }
     }
 
     override fun onDestroyView() {
